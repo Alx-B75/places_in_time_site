@@ -18,7 +18,7 @@ const Chat = () => {
         <button
           type="button"
           className="button primary"
-          onClick={() => openChat('/guest/shakespeare')}
+          onClick={() => openChat('/guest/william-shakespeare')}
         >
           Start a guest chat
         </button>
