@@ -177,6 +177,68 @@ export interface RagContextListParams {
   figure_slug?: string
 }
 
+export interface PlaceSummaries {
+  gen?: string
+  [key: string]: string | undefined
+}
+
+export interface PlaceEcho {
+  title?: string
+  text?: string
+}
+
+export interface PlaceMap {
+  google_embed?: string
+  googleEmbed?: string
+  [key: string]: string | undefined
+}
+
+export interface PlaceLinks {
+  wikipedia?: string
+  official_site?: string
+  officialSite?: string
+  [key: string]: string | undefined
+}
+
+export interface Place {
+  id?: string
+  slug: string
+  name: string
+  description?: string
+  summary?: string
+  teaser?: string
+  siteType?: string
+  primaryEra?: string
+  era_primary?: string
+  era_range?: string
+  timeline_start?: number
+  timeline_end?: number
+  country?: string
+  region?: string
+  location_label?: string
+  locationLabel?: string
+  latitude?: number
+  longitude?: number
+  types?: string[]
+  summaries?: PlaceSummaries
+  echo?: PlaceEcho
+  map?: PlaceMap
+  links?: PlaceLinks
+  hero_image?: string
+  heroImage?: string
+  echo_image?: string
+  echoImage?: string
+  [key: string]: unknown
+}
+
+export interface PlaceListParams {
+  skip?: number
+  limit?: number
+  search?: string
+  country?: string
+  era?: string
+}
+
 export class ApiClient {
   private baseUrl: string
 
@@ -346,6 +408,36 @@ export class ApiClient {
 
   removeFavoriteFigure(slug: string, token: string): Promise<void> {
     return this.request<void>(`/figures/favorites/${encodeURIComponent(slug)}`, { method: 'DELETE' }, token, 'void')
+  }
+
+  async listPlaces(params?: PlaceListParams): Promise<Place[]> {
+    const searchParams = new URLSearchParams()
+    if (typeof params?.skip === 'number') {
+      searchParams.set('skip', String(params.skip))
+    }
+    if (typeof params?.limit === 'number') {
+      searchParams.set('limit', String(params.limit))
+    }
+    if (params?.search) {
+      searchParams.set('search', params.search)
+    }
+    if (params?.country) {
+      searchParams.set('country', params.country)
+    }
+    if (params?.era) {
+      searchParams.set('era', params.era)
+    }
+    const query = searchParams.toString()
+    const path = query ? `/places/?${query}` : '/places/'
+    const data = await this.request<Place[] | { items?: Place[] }>(path, { method: 'GET' })
+    if (Array.isArray(data)) {
+      return data
+    }
+    return data.items ?? []
+  }
+
+  getPlace(slug: string): Promise<Place> {
+    return this.request<Place>(`/places/${encodeURIComponent(slug)}`, { method: 'GET' })
   }
 
   ask(payload: AskRequest, token?: string): Promise<AskResponse> {

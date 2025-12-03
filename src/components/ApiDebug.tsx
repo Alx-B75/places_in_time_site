@@ -3,6 +3,10 @@ import { api } from '../api'
 import type { HistoricalFigure } from '../api/apiClient'
 
 const ApiDebug = () => {
+  if (import.meta.env.PROD) {
+    return null
+  }
+
   const [health, setHealth] = useState<string>('pending')
   const [figures, setFigures] = useState<HistoricalFigure[]>([])
   const [error, setError] = useState<string | null>(null)
