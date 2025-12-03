@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "export:places": "node scripts/export_places_json.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",
