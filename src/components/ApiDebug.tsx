@@ -9,11 +9,6 @@ const ApiDebug = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!import.meta.env.DEV) {
-      setLoading(false)
-      return
-    }
-
     let cancelled = false
 
     const fetchDebugData = async () => {
@@ -47,10 +42,6 @@ const ApiDebug = () => {
       cancelled = true
     }
   }, [])
-
-  if (!import.meta.env.DEV) {
-    return null
-  }
 
   return (
     <section className="api-debug">
