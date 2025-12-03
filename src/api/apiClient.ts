@@ -1,0 +1,421 @@
+export class ApiError extends Error {
+  public status: number
+  public details?: unknown
+
+  constructor(message: string, status: number, details?: unknown) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+    this.details = details
+  }
+}
+
+const RESPONSE_TYPES = ['json', 'blob', 'text', 'void'] as const
+
+type ResponseType = (typeof RESPONSE_TYPES)[number]
+type RequestBody = BodyInit | Record<string, unknown> | null | undefined
+
+export interface HealthResponse {
+  status: string
+}
+
+export interface User {
+  id: string
+  email: string
+  name?: string
+  role?: string
+}
+
+export interface AuthResponse {
+  access_token: string
+  token_type?: string
+  refresh_token?: string
+  user?: User
+}
+
+export interface RegisterRequest {
+  email: string
+  password: string
+  name?: string
+}
+
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface AuthLoginRequest {
+  username: string
+  password: string
+}
+
+export interface HistoricalFigure {
+  slug: string
+  name: string
+  era_primary?: string
+  summary?: string
+  teaser?: string
+  image_url?: string
+  tags?: string[]
+}
+
+export interface FavoriteFigure {
+  id?: string
+  figure_slug: string
+  figure?: HistoricalFigure
+  added_at?: string
+}
+
+export interface AskRequest {
+  prompt: string
+  figure_slug?: string
+  thread_id?: string
+}
+
+export interface AskSource {
+  id?: string
+  title?: string
+  snippet?: string
+  url?: string
+}
+
+export interface AskUsage {
+  input_tokens?: number
+  output_tokens?: number
+  cost?: number
+}
+
+export interface AskResponse {
+  answer: string
+  thread_id?: string
+  sources?: AskSource[]
+  usage?: AskUsage
+}
+
+export interface GuestStartResponse {
+  guest_token: string
+  figure_slug: string
+  thread_id: string
+}
+
+export interface GuestAskRequest {
+  prompt: string
+  thread_id: string
+  guest_token: string
+}
+
+export interface GuestAskResponse {
+  answer: string
+  thread_id: string
+  sources?: AskSource[]
+}
+
+export interface Thread {
+  id: string
+  figure_slug?: string
+  title?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface ThreadCreate {
+  figure_slug?: string
+  title?: string
+}
+
+export interface AdminFigureCreate {
+  slug: string
+  name: string
+  summary?: string
+  era_primary?: string
+  teaser?: string
+  tags?: string[]
+}
+
+export interface AdminFigureUpdate extends Partial<AdminFigureCreate> {}
+
+export interface RagSourceCreate {
+  name: string
+  figure_slug?: string
+  type?: string
+  url?: string
+  content?: string
+}
+
+export interface RagSource {
+  id: string
+  name: string
+  figure_slug?: string
+  type?: string
+  url?: string
+  content?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface RagContext {
+  id: string
+  figure_slug: string
+  source_id?: string
+  content: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface RagContextUpdate {
+  content?: string
+  figure_slug?: string
+  source_id?: string
+}
+
+export interface FigureListParams {
+  skip?: number
+  limit?: number
+}
+
+export interface RagContextListParams {
+  figure_slug?: string
+}
+
+export class ApiClient {
+  private baseUrl: string
+
+  constructor(baseUrl: string = 'http://localhost:8000') {
+    this.baseUrl = baseUrl.replace(/\/$/, '')
+  }
+
+  private buildUrl(path: string): string {
+    if (path.startsWith('http')) {
+      return path
+    }
+    const cleanPath = path.startsWith('/') ? path : `/${path}`
+    return `${this.baseUrl}${cleanPath}`
+  }
+
+  private prepareBody(body: RequestBody, headers: Headers): BodyInit | undefined {
+    if (body === null || body === undefined) {
+      return undefined
+    }
+
+    if (body instanceof FormData || typeof body === 'string' || body instanceof Blob || body instanceof ArrayBuffer || body instanceof URLSearchParams) {
+      return body
+    }
+
+    if (!headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json')
+    }
+
+    return JSON.stringify(body)
+  }
+
+  private async request<T>(
+    path: string,
+    options: RequestInit & { body?: RequestBody } = {},
+    token?: string,
+    responseType: ResponseType = 'json',
+  ): Promise<T> {
+    const headers = new Headers(options.headers)
+
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`)
+    }
+
+    const preparedBody = this.prepareBody(options.body, headers)
+
+    const response = await fetch(this.buildUrl(path), {
+      ...options,
+      headers,
+      body: preparedBody,
+    })
+
+    if (!response.ok) {
+      let details: unknown
+      let message = response.statusText || 'Request failed'
+
+      try {
+        details = await response.clone().json()
+        if (details && typeof details === 'object' && 'detail' in details) {
+          const detailValue = (details as { detail?: unknown }).detail
+          if (typeof detailValue === 'string') {
+            message = detailValue
+          }
+        }
+        if (details && typeof details === 'object' && 'message' in details) {
+          const detailValue = (details as { message?: unknown }).message
+          if (typeof detailValue === 'string') {
+            message = detailValue
+          }
+        }
+      } catch {
+        try {
+          const text = await response.clone().text()
+          if (text) {
+            details = text
+            message = text
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      throw new ApiError(message, response.status, details)
+    }
+
+    if (responseType === 'void') {
+      return undefined as T
+    }
+
+    if (responseType === 'blob') {
+      const blob = await response.blob()
+      return blob as T
+    }
+
+    if (responseType === 'text') {
+      const text = await response.text()
+      return text as T
+    }
+
+    if (response.status === 204) {
+      return undefined as T
+    }
+
+    const text = await response.text()
+    if (!text) {
+      return undefined as T
+    }
+
+    return JSON.parse(text) as T
+  }
+
+  health(): Promise<HealthResponse> {
+    return this.request<HealthResponse>('/health', { method: 'GET' })
+  }
+
+  register(payload: RegisterRequest): Promise<AuthResponse> {
+    return this.request<AuthResponse>('/register', { method: 'POST', body: payload })
+  }
+
+  login(payload: LoginRequest): Promise<AuthResponse> {
+    return this.request<AuthResponse>('/login', { method: 'POST', body: payload })
+  }
+
+  authLogin(payload: AuthLoginRequest): Promise<AuthResponse> {
+    return this.request<AuthResponse>('/auth/login', { method: 'POST', body: payload })
+  }
+
+  adminStepUp(token: string): Promise<AuthResponse> {
+    return this.request<AuthResponse>('/auth/admin/stepup', { method: 'POST' }, token)
+  }
+
+  async listFigures(params?: FigureListParams): Promise<HistoricalFigure[]> {
+    const searchParams = new URLSearchParams()
+    if (typeof params?.skip === 'number') {
+      searchParams.set('skip', String(params.skip))
+    }
+    if (typeof params?.limit === 'number') {
+      searchParams.set('limit', String(params.limit))
+    }
+    const query = searchParams.toString()
+    const path = query ? `/figures/?${query}` : '/figures/'
+    const data = await this.request<HistoricalFigure[] | { items?: HistoricalFigure[] }>(path, { method: 'GET' })
+    if (Array.isArray(data)) {
+      return data
+    }
+    return data.items ?? []
+  }
+
+  getFigure(slug: string): Promise<HistoricalFigure> {
+    return this.request<HistoricalFigure>(`/figures/${encodeURIComponent(slug)}`, { method: 'GET' })
+  }
+
+  async listFavoriteFigures(token: string): Promise<FavoriteFigure[]> {
+    const data = await this.request<FavoriteFigure[] | { items?: FavoriteFigure[] }>(
+      '/figures/favorites',
+      { method: 'GET' },
+      token,
+    )
+    if (Array.isArray(data)) {
+      return data
+    }
+    return data.items ?? []
+  }
+
+  addFavoriteFigure(slug: string, token: string): Promise<FavoriteFigure> {
+    return this.request<FavoriteFigure>(`/figures/favorites/${encodeURIComponent(slug)}`, { method: 'POST' }, token)
+  }
+
+  removeFavoriteFigure(slug: string, token: string): Promise<void> {
+    return this.request<void>(`/figures/favorites/${encodeURIComponent(slug)}`, { method: 'DELETE' }, token, 'void')
+  }
+
+  ask(payload: AskRequest, token?: string): Promise<AskResponse> {
+    return this.request<AskResponse>('/ask', { method: 'POST', body: payload }, token)
+  }
+
+  guestStart(figureSlug: string): Promise<GuestStartResponse> {
+    const params = new URLSearchParams({ figure_slug: figureSlug })
+    return this.request<GuestStartResponse>(`/guest/start?${params.toString()}`, { method: 'POST' })
+  }
+
+  guestAsk(payload: GuestAskRequest): Promise<GuestAskResponse> {
+    return this.request<GuestAskResponse>('/guest/ask', { method: 'POST', body: payload })
+  }
+
+  createThread(payload: ThreadCreate, token?: string): Promise<Thread> {
+    return this.request<Thread>('/threads', { method: 'POST', body: payload }, token)
+  }
+
+  deleteThread(threadId: string, token: string): Promise<void> {
+    return this.request<void>(`/threads/${encodeURIComponent(threadId)}`, { method: 'DELETE' }, token, 'void')
+  }
+
+  downloadDb(token?: string): Promise<Blob> {
+    return this.request<Blob>('/download_db', { method: 'GET' }, token, 'blob')
+  }
+
+  async adminListFigures(token: string): Promise<HistoricalFigure[]> {
+    const data = await this.request<HistoricalFigure[] | { items?: HistoricalFigure[] }>(
+      '/admin/figures',
+      { method: 'GET' },
+      token,
+    )
+    if (Array.isArray(data)) {
+      return data
+    }
+    return data.items ?? []
+  }
+
+  adminCreateFigure(payload: AdminFigureCreate, token: string): Promise<HistoricalFigure> {
+    return this.request<HistoricalFigure>('/admin/figures', { method: 'POST', body: payload }, token)
+  }
+
+  adminUpdateFigure(slug: string, payload: AdminFigureUpdate, token: string): Promise<HistoricalFigure> {
+    return this.request<HistoricalFigure>(`/admin/figures/${encodeURIComponent(slug)}`, { method: 'PATCH', body: payload }, token)
+  }
+
+  adminDeleteFigure(slug: string, token: string): Promise<void> {
+    return this.request<void>(`/admin/figures/${encodeURIComponent(slug)}`, { method: 'DELETE' }, token, 'void')
+  }
+
+  adminCreateRagSource(payload: RagSourceCreate, token: string): Promise<RagSource> {
+    return this.request<RagSource>('/admin/rag/sources', { method: 'POST', body: payload }, token)
+  }
+
+  adminListRagContexts(params: RagContextListParams | undefined, token: string): Promise<RagContext[]> {
+    const searchParams = new URLSearchParams()
+    if (params?.figure_slug) {
+      searchParams.set('figure_slug', params.figure_slug)
+    }
+    const query = searchParams.toString()
+    const path = query ? `/admin/rag/contexts?${query}` : '/admin/rag/contexts'
+    return this.request<RagContext[]>(path, { method: 'GET' }, token)
+  }
+
+  adminUpdateRagContext(ctxId: string, payload: RagContextUpdate, token: string): Promise<RagContext> {
+    return this.request<RagContext>(`/admin/rag/contexts/${encodeURIComponent(ctxId)}`, { method: 'PATCH', body: payload }, token)
+  }
+
+  adminDeleteRagContext(ctxId: string, token: string): Promise<void> {
+    return this.request<void>(`/admin/rag/contexts/${encodeURIComponent(ctxId)}`, { method: 'DELETE' }, token, 'void')
+  }
+ }

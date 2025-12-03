@@ -340,6 +340,28 @@ button {
   font-weight: 600;
 }
 
+.api-debug {
+  margin-top: 2.5rem;
+  padding: 1.5rem;
+  border: 1px dashed var(--border);
+  border-radius: 1rem;
+  background: rgba(91, 75, 138, 0.04);
+}
+
+.api-debug h2 {
+  margin-top: 0;
+}
+
+.api-debug ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.api-debug-error {
+  color: #b3261e;
+  font-weight: 600;
+}
+
 @media (max-width: 640px) {
   .header-inner {
     flex-direction: column;
