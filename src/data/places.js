@@ -8,6 +8,24 @@ export const PLACES = [
     region: 'midlands',
     teaser:
       'Richard III and Henry Tudor clashed here in 1485, closing the Wars of the Roses and crowning a new dynasty.',
+    latitude: 52.598,
+    longitude: -1.409,
+    timeline_start: 1485,
+    timeline_end: 1485,
+  },
+  {
+    slug: 'stonehenge',
+    name: 'Stonehenge',
+    siteType: 'stone circle',
+    primaryEra: 'neolithic',
+    country: 'england',
+    region: 'wessex',
+    teaser:
+      'Rings of sarsen and bluestone raised between 3000 and 2000 BCE, aligning ritual, astronomy, and engineering feats.',
+    latitude: 51.1789,
+    longitude: -1.8262,
+    timeline_start: -3000,
+    timeline_end: -2000,
   },
   {
     slug: 'loch-ness',
@@ -18,6 +36,10 @@ export const PLACES = [
     region: 'highlands',
     teaser:
       'A glacial trench lake that guards Pictish legends, monastic ruins, and tales of creatures beneath the surface.',
+    latitude: 57.3229,
+    longitude: -4.4244,
+    timeline_start: 500,
+    timeline_end: 2025,
   },
   {
     slug: 'edinburgh-castle',
@@ -28,6 +50,10 @@ export const PLACES = [
     region: 'lothian',
     teaser:
       'Perched on Castle Rock, it watched over royals, sieges, and the nation’s regalia for nearly a millennium.',
+    latitude: 55.9486,
+    longitude: -3.1999,
+    timeline_start: 1100,
+    timeline_end: 1900,
   },
   {
     slug: 'warwick-castle',
@@ -38,6 +64,10 @@ export const PLACES = [
     region: 'midlands',
     teaser:
       'A mighty keep of the Kingmaker earls, overseeing the Avon and centuries of Tudor and Stuart spectacle.',
+    latitude: 52.2797,
+    longitude: -1.5856,
+    timeline_start: 1068,
+    timeline_end: 1900,
   },
   {
     slug: 'york',
@@ -48,6 +78,10 @@ export const PLACES = [
     region: 'yorkshire',
     teaser:
       'From Eboracum to Jorvik to York Minster, the city bridges Roman legions, Norse traders, and ecclesiastical power.',
+    latitude: 53.959,
+    longitude: -1.0815,
+    timeline_start: 71,
+    timeline_end: 2025,
   },
   {
     slug: 'lindisfarne',
@@ -58,5 +92,93 @@ export const PLACES = [
     region: 'northumbria',
     teaser:
       'The Holy Island whose priory illuminated manuscripts and endured the first recorded Viking raid in Britain.',
+    latitude: 55.6693,
+    longitude: -1.7936,
+    timeline_start: 635,
+    timeline_end: 900,
+  },
+  {
+    slug: 'vindolanda',
+    name: 'Vindolanda',
+    siteType: 'roman fort',
+    primaryEra: 'roman',
+    country: 'england',
+    region: 'northumberland',
+    teaser:
+      'An auxiliary fort south of Hadrian’s Wall where organic finds and the Vindolanda tablets reveal everyday frontier life.',
+    latitude: 54.9902,
+    longitude: -2.3671,
+    timeline_start: 85,
+    timeline_end: 410,
+  },
+  {
+    slug: 'tower-of-london',
+    name: 'The Tower of London',
+    siteType: 'fortress',
+    primaryEra: 'medieval',
+    country: 'england',
+    region: 'london',
+    teaser:
+      'William the Conqueror’s riverside stronghold that evolved into palace, prison, armoury, and keeper of the Crown Jewels.',
+    latitude: 51.5085,
+    longitude: -0.0761,
+    timeline_start: 1078,
+    timeline_end: 2025,
+  },
+  {
+    slug: 'battle-of-hastings',
+    name: 'The Battle of Hastings',
+    siteType: 'battlefield',
+    primaryEra: 'norman-conquest',
+    country: 'england',
+    region: 'east-sussex',
+    teaser:
+      'The 1066 clash near Hastings where William’s Norman forces toppled Harold Godwinson and remade the English crown.',
+    latitude: 50.9072,
+    longitude: 0.4858,
+    timeline_start: 1066,
+    timeline_end: 1066,
+  },
+  {
+    slug: 'stratford-upon-avon',
+    name: 'Stratford-upon-Avon',
+    siteType: 'historic town',
+    primaryEra: 'early-modern',
+    country: 'england',
+    region: 'warwickshire',
+    teaser:
+      'Medieval market town best known as Shakespeare’s birthplace, now a riverside hub for Tudor stories and theatre.',
+    latitude: 52.1917,
+    longitude: -1.7073,
+    timeline_start: 1200,
+    timeline_end: 2025,
+  },
+  {
+    slug: 'the-globe-theatre',
+    name: 'The Globe Theatre',
+    siteType: 'theatre',
+    primaryEra: 'elizabethan-modern',
+    country: 'england',
+    region: 'london',
+    teaser:
+      'Shakespeare’s Bankside playhouse reborn in 1997, echoing the 1599 original with open-air performances and tours.',
+    latitude: 51.5048,
+    longitude: -0.0917,
+    timeline_start: 1599,
+    timeline_end: 2025,
+  },
+  {
+    slug: 'hadrians-wall',
+    name: 'Hadrian’s Wall',
+    siteType: 'roman frontier',
+    primaryEra: 'roman',
+    country: 'england',
+    region: 'northumberland-cumbria',
+    teaser:
+      'A 73-mile stone-and-turf frontier raised in AD 122 to anchor Rome’s north-west edge with forts, milecastles, and ditches.',
+    latitude: 55.0212,
+    longitude: -2.2888,
+    timeline_start: 122,
+    timeline_end: 410,
   },
 ]
