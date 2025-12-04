@@ -230,10 +230,10 @@ export interface Place {
   links?: PlaceLinks
   link_wikipedia?: string
   link_official_site?: string
-  hero_image?: string
-  heroImage?: string
-  echo_image?: string
-  echoImage?: string
+  hero_image?: string | null
+  heroImage?: string | null
+  echo_image?: string | null
+  echoImage?: string | null
   [key: string]: unknown
 }
 

@@ -77,6 +77,11 @@ const Places = () => {
         {places.map((place) => (
           <li key={place.slug} className="card place-card">
             <Link to={`/places/${place.slug}`}>
+              {place.hero_image && (
+                <div className="place-card-image">
+                  <img src={place.hero_image} alt={place.name} loading="lazy" />
+                </div>
+              )}
               <div className="place-card-heading">
                 <p className="card-eyebrow">{buildEra(place)}</p>
                 <h2>{place.name}</h2>

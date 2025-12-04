@@ -223,6 +223,20 @@ button {
   gap: 0.75rem;
 }
 
+.place-card-image {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.place-card-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
 .place-card-heading {
   display: flex;
   flex-direction: column;
@@ -268,11 +282,71 @@ button {
   font-weight: 600;
 }
 
+.place-hero {
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.place-hero-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
 .echoes {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 1rem;
   padding: 1.5rem;
+}
+
+.place-echo {
+  background: #0b1724;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #f2f5ff;
+}
+
+.place-echo-header h2 {
+  margin: 0 0 0.25rem;
+}
+
+.place-echo-header h3 {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.place-echo-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .place-echo-body {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.place-echo-media {
+  flex: 0 0 220px;
+  max-width: 260px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.place-echo-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.place-echo-text {
+  flex: 1;
 }
 
 .fast-facts {

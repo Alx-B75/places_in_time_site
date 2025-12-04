@@ -125,6 +125,8 @@ const PlacePage = () => {
   const types = getTypes(place)
   const echoTitle = place.echo_title ?? place.echo?.title
   const echoText = place.echo_text ?? place.echo?.text
+  const echoImage = place.echo_image ?? place.echoImage
+  const heroImage = place.hero_image ?? place.heroImage
   const mapEmbed = place.map_google_embed ?? place.map?.google_embed ?? place.map?.googleEmbed
   const officialLink = place.link_official_site ?? place.links?.official_site ?? place.links?.officialSite
   const wikipediaLink = place.link_wikipedia ?? place.links?.wikipedia
@@ -139,6 +141,11 @@ const PlacePage = () => {
 
   return (
     <article className="detail-page place-detail">
+      {heroImage && (
+        <section className="place-hero">
+          <img src={heroImage} alt={place.name} className="place-hero-image" />
+        </section>
+      )}
       <header className="place-header">
         {era && <p className="eyebrow">{era}</p>}
         <h1>{place.name}</h1>
@@ -160,11 +167,28 @@ const PlacePage = () => {
         </section>
       )}
 
-      {echoText && (
-        <section className="echoes">
-          <h2>Echoes from the Past</h2>
-          {echoTitle && <h3>{echoTitle}</h3>}
-          <p>{echoText}</p>
+      {(echoText || echoImage) && (
+        <section className="echoes place-echo">
+          <div className="place-echo-header">
+            <h2>Echoes from the Past</h2>
+            {echoTitle && <h3>{echoTitle}</h3>}
+          </div>
+          <div className="place-echo-body">
+            {echoImage && (
+              <div className="place-echo-media">
+                <img
+                  src={echoImage}
+                  alt={echoTitle ? `${echoTitle} illustration` : `Echo from ${place.name}`}
+                  loading="lazy"
+                />
+              </div>
+            )}
+            {echoText && (
+              <div className="place-echo-text">
+                <p>{echoText}</p>
+              </div>
+            )}
+          </div>
         </section>
       )}
 
