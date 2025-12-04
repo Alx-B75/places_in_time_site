@@ -17,7 +17,12 @@ const buildEra = (place: Place): string =>
 
 const getSummary = (place: Place): string => {
   const text =
-    place.summaries?.gen ?? place.summary ?? place.teaser ?? place.description ?? ''
+    place.summary_gen ??
+    place.summaries?.gen ??
+    place.summary ??
+    place.teaser ??
+    place.description ??
+    ''
   if (text.length <= 190) return text
   return `${text.slice(0, 187).trimEnd()}…`
 }

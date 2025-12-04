@@ -17,12 +17,36 @@ const buildEra = (place: Place): string =>
   place.era_range ?? place.era_primary ?? place.primaryEra ?? ''
 
 const getSummary = (place: Place): string =>
-  place.summaries?.gen ?? place.summary ?? place.teaser ?? place.description ?? ''
+  place.summary_gen ?? place.summaries?.gen ?? place.summary ?? place.teaser ?? place.description ?? ''
 
 const getTypes = (place: Place): string[] => {
   if (Array.isArray(place.types) && place.types.length > 0) return place.types
   if (place.siteType) return [place.siteType]
   return []
+}
+
+const formatYear = (value?: number): string => {
+  if (typeof value !== 'number') {
+    return ''
+  }
+  if (value < 0) {
+    return `${Math.abs(value)} BCE`
+  }
+  return `${value} CE`
+}
+
+const buildTimeline = (start?: number, end?: number): string => {
+  const startText = formatYear(start)
+  const endText = formatYear(end)
+
+  if (startText && endText) {
+    if (startText === endText) {
+      return startText
+    }
+    return `${startText} – ${endText}`
+  }
+
+  return startText || endText
 }
 
 const PlacePage = () => {
@@ -99,16 +123,18 @@ const PlacePage = () => {
   const era = buildEra(place)
   const summary = getSummary(place)
   const types = getTypes(place)
-  const echoTitle = place.echo?.title
-  const echoText = place.echo?.text
-  const mapEmbed = place.map?.google_embed ?? place.map?.googleEmbed
-  const officialLink = place.links?.official_site ?? place.links?.officialSite
-  const wikipediaLink = place.links?.wikipedia
+  const echoTitle = place.echo_title ?? place.echo?.title
+  const echoText = place.echo_text ?? place.echo?.text
+  const mapEmbed = place.map_google_embed ?? place.map?.google_embed ?? place.map?.googleEmbed
+  const officialLink = place.link_official_site ?? place.links?.official_site ?? place.links?.officialSite
+  const wikipediaLink = place.link_wikipedia ?? place.links?.wikipedia
+  const timeline = buildTimeline(place.timeline_start, place.timeline_end)
 
   const facts = [
     { label: 'Location', value: location },
     { label: 'Era', value: era },
     { label: 'Type', value: types.join(', ') },
+    { label: 'Timeline', value: timeline },
   ].filter((fact) => fact.value)
 
   return (

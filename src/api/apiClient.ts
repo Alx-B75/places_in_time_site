@@ -206,6 +206,7 @@ export interface Place {
   name: string
   description?: string
   summary?: string
+  summary_gen?: string
   teaser?: string
   siteType?: string
   primaryEra?: string
@@ -222,8 +223,13 @@ export interface Place {
   types?: string[]
   summaries?: PlaceSummaries
   echo?: PlaceEcho
+  echo_title?: string
+  echo_text?: string
   map?: PlaceMap
+  map_google_embed?: string
   links?: PlaceLinks
+  link_wikipedia?: string
+  link_official_site?: string
   hero_image?: string
   heroImage?: string
   echo_image?: string
