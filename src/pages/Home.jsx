@@ -40,7 +40,14 @@ const accentFromEra = (primaryEra) => {
   return 'modern'
 }
 
-const featuredPlaces = PLACES.slice(0, 3).map((place) => ({
+const featuredSlugOrder = ['bosworth', 'stonehenge', 'hadrians-wall', 'edinburgh-castle']
+const prioritizedPlaces = featuredSlugOrder
+  .map((slug) => PLACES.find((place) => place.slug === slug))
+  .filter(Boolean)
+const fallbackPlaces = PLACES.filter((place) => !featuredSlugOrder.includes(place.slug))
+
+const featuredPlaces = [...prioritizedPlaces, ...fallbackPlaces].slice(0, 4).map((place) => ({
+  slug: place.slug,
   title: place.name,
   era: place.era_primary,
   accent: accentFromEra(place.primaryEra ?? ''),
