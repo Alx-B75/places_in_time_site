@@ -9,6 +9,9 @@ const Shop = () => {
           {/* TODO: swap copy when merch catalog is ready */}
         </p>
         <p>Check back after launch week or join the mailing list for early access.</p>
+        <a className="button primary" href="https://www.redbubble.com/people/alex-bunting/shop" target="_blank" rel="noreferrer">
+          Visit the Redbubble shop
+        </a>
       </div>
     </div>
   )
