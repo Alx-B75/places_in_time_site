@@ -36,7 +36,32 @@ const AppLayout = ({ children }) => {
         <div className="content-container">{children}</div>
       </main>
       <footer className="site-footer">
-        <div className="content-container">© {currentYear} Places in Time</div>
+        <div className="content-container footer-grid">
+          <div>
+            <p className="eyebrow">Places in Time</p>
+            <p>
+              A design system for historical storytelling products. Layer maps, people, and guided chat into one atlas.
+            </p>
+            <small>© {currentYear} Places in Time</small>
+          </div>
+          <div>
+            <p className="eyebrow">Explore</p>
+            <p>
+              <NavLink to="/places">Places atlas</NavLink>
+            </p>
+            <p>
+              <NavLink to="/people">Figures roster</NavLink>
+            </p>
+            <p>
+              <NavLink to="/chat">Talk to history</NavLink>
+            </p>
+          </div>
+          <div>
+            <p className="eyebrow">Stay in touch</p>
+            <p>hello@placesintime.app</p>
+            <p>Design system v1.0</p>
+          </div>
+        </div>
       </footer>
     </div>
   )
