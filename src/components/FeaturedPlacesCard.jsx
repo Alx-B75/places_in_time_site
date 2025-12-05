@@ -3,14 +3,23 @@ const FeaturedPlacesCard = ({ place }) => {
     return null
   }
 
+  const {
+    era,
+    accent = 'modern',
+    title = 'Untitled place',
+    summary = '/* TODO: add real summary */',
+    location = 'Location forthcoming',
+    highlight,
+  } = place
+
   return (
     <article className="featured-card">
-      {place.era && <span className={`era-chip ${place.accent ?? 'modern'}`}>{place.era}</span>}
-      <h3 className="featured-title">{place.title}</h3>
-      <p>{place.summary}</p>
+      {era && <span className={`era-chip ${accent}`}>{era}</span>}
+      <h3 className="featured-title">{title}</h3>
+      <p>{summary}</p>
       <div className="card-meta">
-        <strong>{place.location}</strong>
-        <p>{place.highlight}</p>
+        <strong>{location}</strong>
+        {highlight && <p>{highlight}</p>}
       </div>
     </article>
   )

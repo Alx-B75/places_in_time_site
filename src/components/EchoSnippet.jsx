@@ -3,10 +3,12 @@ const EchoSnippet = ({ snippet }) => {
     return null
   }
 
+  const { text = '/* TODO: add echo */', source = 'Unknown source' } = snippet
+
   return (
     <article className="echo-snippet">
-      <p>{snippet.text}</p>
-      <cite>— {snippet.source}</cite>
+      <p>{text}</p>
+      <cite aria-label="echo source">— {source}</cite>
     </article>
   )
 }

@@ -5,6 +5,7 @@ const navLinks = [
   { to: '/places', label: 'Places' },
   { to: '/people', label: 'People' },
   { to: '/chat', label: 'Talk to History' },
+  { to: '/shop', label: 'Shop' },
 ]
 
 const AppLayout = ({ children }) => {
@@ -54,6 +55,9 @@ const AppLayout = ({ children }) => {
             </p>
             <p>
               <NavLink to="/chat">Talk to history</NavLink>
+            </p>
+            <p>
+              <NavLink to="/shop">Shop preview</NavLink>
             </p>
           </div>
           <div>

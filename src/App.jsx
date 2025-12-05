@@ -6,6 +6,8 @@ import Place from './pages/Place.tsx'
 import People from './pages/People.jsx'
 import Person from './pages/Person.jsx'
 import Chat from './pages/Chat.jsx'
+import Shop from './pages/Shop.jsx'
+import News from './pages/News.jsx'
 
 const App = () => {
   return (
@@ -17,6 +19,8 @@ const App = () => {
         <Route path="/people" element={<People />} />
         <Route path="/people/:slug" element={<Person />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/news" element={<News />} />
       </Routes>
     </AppLayout>
   )

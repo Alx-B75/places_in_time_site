@@ -4,10 +4,10 @@ const ChatPreviewBlock = ({ messages }) => {
   }
 
   return (
-    <div className="chat-preview">
+    <div className="chat-preview" aria-label="Chat preview transcript">
       {messages.map((message) => (
         <div key={message.id} className={`chat-bubble ${message.role}`}>
-          <p>{message.text}</p>
+          <p>{message.text ?? '/* TODO: add chat text */'}</p>
         </div>
       ))}
     </div>
