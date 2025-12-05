@@ -31,6 +31,17 @@ const figureImagery = {
   aethelflaed: 'https://images.unsplash.com/photo-1437913135140-944c1ee62782?auto=format&fit=crop&w=800&q=60',
 }
 
+const placeImagery = {
+  bosworth: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=60',
+  stonehenge: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=60',
+  'hadrians-wall': 'https://images.unsplash.com/photo-1500534314209-75f4cdb5e7ae?auto=format&fit=crop&w=1200&q=60',
+  'edinburgh-castle': 'https://images.unsplash.com/photo-1500534314209-91e3b4ef7de7?auto=format&fit=crop&w=1200&q=60',
+  'tower-of-london': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=60',
+  'battle-of-hastings': 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=60',
+}
+
+const defaultPlaceImage = 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=60'
+
 const accentFromEra = (primaryEra) => {
   if (!primaryEra) return 'modern'
   if (primaryEra.includes('neolithic')) return 'neolithic'
@@ -54,6 +65,8 @@ const featuredPlaces = [...prioritizedPlaces, ...fallbackPlaces].slice(0, 4).map
   summary: place.teaser ?? place.summaries?.gen,
   location: place.location_label,
   highlight: place.echo?.title ?? place.types?.join(', '),
+  image: place.hero_image || placeImagery[place.slug] || place.echo_image || defaultPlaceImage,
+  imageAlt: `Hero view of ${place.name}${place.location_label ? ` — ${place.location_label}` : ''}`,
 }))
 
 const figurePreviews = FIGURES.slice(0, 4).map((figure) => ({
