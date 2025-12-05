@@ -147,9 +147,9 @@ span {
 }
 
 .site-header {
-  background: var(--pit-slate);
+  background: var(--pit-teal);
   color: #f4f5f7;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .header-inner {
@@ -194,10 +194,10 @@ span {
 }
 
 .site-footer {
-  background: var(--pit-ink);
-  color: rgba(255, 255, 255, 0.92);
+  background: var(--pit-teal);
+  color: rgba(255, 255, 255, 0.94);
   padding: var(--pit-space-4) var(--pit-space-3);
-  border-top: var(--pit-stroke) solid rgba(255, 255, 255, 0.08);
+  border-top: var(--pit-stroke) solid rgba(255, 255, 255, 0.18);
 }
 
 .site-footer .footer-grid {
