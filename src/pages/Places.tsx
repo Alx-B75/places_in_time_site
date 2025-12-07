@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
 import type { Place } from '../api/apiClient'
+import { resolveMediaUrl } from '../utils/media'
+
+const fallbackPlaceImage = '/images/place-fallback.svg'
 
 const buildLocation = (place: Place): string => {
   if (place.location_label) return place.location_label
@@ -74,14 +77,18 @@ const Places = () => {
 
     return (
       <ul className="card-list places-list">
-        {places.map((place) => (
-          <li key={place.slug} className="card place-card">
-            <Link to={`/places/${place.slug}`}>
-              {place.hero_image && (
-                <div className="place-card-image">
-                  <img src={place.hero_image} alt={place.name} loading="lazy" />
-                </div>
-              )}
+        {places.map((place) => {
+          const heroImage = place.hero_image ?? place.heroImage
+          const imgSrc = resolveMediaUrl(heroImage) ?? fallbackPlaceImage
+
+          return (
+            <li key={place.slug} className="card place-card">
+              <Link to={`/places/${place.slug}`}>
+                {imgSrc && (
+                  <div className="place-card-image">
+                    <img src={imgSrc} alt={place.name} loading="lazy" />
+                  </div>
+                )}
               <div className="place-card-heading">
                 <p className="card-eyebrow">{buildEra(place)}</p>
                 <h2>{place.name}</h2>
@@ -90,9 +97,10 @@ const Places = () => {
                 )}
               </div>
               <p className="place-summary">{getSummary(place)}</p>
-            </Link>
-          </li>
-        ))}
+              </Link>
+            </li>
+          )
+        })}
       </ul>
     )
   }

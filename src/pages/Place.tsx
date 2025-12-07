@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import type { Place } from '../api/apiClient'
 import { ApiError } from '../api'
+import { resolveMediaUrl } from '../utils/media'
 
 const buildLocation = (place: Place): string => {
   if (place.location_label) return place.location_label
@@ -125,8 +126,10 @@ const PlacePage = () => {
   const types = getTypes(place)
   const echoTitle = place.echo_title ?? place.echo?.title
   const echoText = place.echo_text ?? place.echo?.text
-  const echoImage = place.echo_image ?? place.echoImage
   const heroImage = place.hero_image ?? place.heroImage
+  const echoImage = place.echo_image ?? place.echoImage
+  const heroSrc = resolveMediaUrl(heroImage)
+  const echoSrc = resolveMediaUrl(echoImage)
   const mapEmbed = place.map_google_embed ?? place.map?.google_embed ?? place.map?.googleEmbed
   const officialLink = place.link_official_site ?? place.links?.official_site ?? place.links?.officialSite
   const wikipediaLink = place.link_wikipedia ?? place.links?.wikipedia
@@ -141,9 +144,9 @@ const PlacePage = () => {
 
   return (
     <article className="detail-page place-detail">
-      {heroImage && (
+      {heroSrc && (
         <section className="place-hero">
-          <img src={heroImage} alt={place.name} className="place-hero-image" />
+          <img src={heroSrc} alt={place.name} className="place-hero-image" />
         </section>
       )}
       <header className="place-header">
@@ -174,10 +177,10 @@ const PlacePage = () => {
             {echoTitle && <h3>{echoTitle}</h3>}
           </div>
           <div className="place-echo-body">
-            {echoImage && (
+            {echoSrc && (
               <div className="place-echo-media">
                 <img
-                  src={echoImage}
+                  src={echoSrc}
                   alt={echoTitle ? `${echoTitle} illustration` : `Echo from ${place.name}`}
                   loading="lazy"
                 />

@@ -731,6 +731,34 @@ span {
   object-fit: cover;
 }
 
+.person-detail .person-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.person-portrait {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #101a2a;
+}
+
+.person-portrait img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+@media (min-width: 768px) {
+  .person-detail .person-header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
 .echoes {
   background: var(--surface);
   border: 1px solid var(--border);
