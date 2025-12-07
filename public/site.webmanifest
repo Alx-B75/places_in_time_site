@@ -1,0 +1,19 @@
+{
+  "name": "Places in Time",
+  "short_name": "Places in Time",
+  "description": "A design system for historical storytelling across Britain’s places and figures.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#0f4c5c",
+  "background_color": "#f5efe6",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "en"
+}
