@@ -7,7 +7,74 @@ import { resolveMediaUrl } from '../utils/media'
 
 const fallbackFigureImage = '/images/figure-fallback.svg'
 
-type FigureLike = HistoricalFigure & { primaryEra?: string; imageUrl?: string }
+type FigureLike = HistoricalFigure & {
+  primaryEra?: string
+  era_primary?: string
+  summary?: string
+  teaser?: string
+  imageUrl?: string
+  mainSite?: string
+}
+
+const buildEra = (figure: FigureLike): string =>
+  figure.era ?? figure.primaryEra ?? figure.era_primary ?? ''
+
+const buildTeaser = (figure: FigureLike): string =>
+  figure.short_summary ?? figure.teaser ?? figure.summary ?? ''
+
+const formatYear = (value?: number | null): string => {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return ''
+  }
+  return value < 0 ? `${Math.abs(value)} BCE` : `${value} CE`
+}
+
+const formatLifespan = (birth?: number | null, death?: number | null): string | undefined => {
+  const birthText = formatYear(birth)
+  const deathText = formatYear(death)
+
+  if (birthText && deathText) {
+    return `${birthText} – ${deathText}`
+  }
+
+  if (birthText) return birthText
+  if (deathText) return deathText
+  return undefined
+}
+
+const formatRoles = (roles?: HistoricalFigure['roles']): string | undefined => {
+  if (!roles) return undefined
+
+  if (Array.isArray(roles)) {
+    const cleaned = roles
+      .filter((role): role is string => typeof role === 'string' && role.trim().length > 0)
+      .map((role) => role.trim())
+    return cleaned.length > 0 ? cleaned.join(', ') : undefined
+  }
+
+  if (typeof roles === 'string') {
+    const trimmed = roles.trim()
+    if (!trimmed) return undefined
+    if (trimmed.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(trimmed)
+        if (Array.isArray(parsed)) {
+          const cleaned = parsed
+            .filter((role): role is string => typeof role === 'string' && role.trim().length > 0)
+            .map((role) => role.trim())
+          if (cleaned.length > 0) {
+            return cleaned.join(', ')
+          }
+        }
+      } catch {
+        // fall through to returning the trimmed string
+      }
+    }
+    return trimmed
+  }
+
+  return undefined
+}
 
 const Person = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -88,10 +155,21 @@ const Person = () => {
     )
   }
 
-  const era = figure.era_primary ?? figure.primaryEra ?? ''
-  const teaser = figure.teaser ?? figure.summary ?? ''
+  const era = buildEra(figure)
+  const teaser = buildTeaser(figure)
   const portrait = figure.image_url ?? figure.imageUrl
   const portraitSrc = resolveMediaUrl(portrait) ?? fallbackFigureImage
+  const quote = figure.quote ?? null
+  const mainSite = figure.main_site ?? figure.mainSite ?? null
+  const lifespan = formatLifespan(figure.birth_year, figure.death_year)
+  const rolesLine = formatRoles(figure.roles)
+  const longBio = figure.long_bio ?? null
+  const longBioParagraphs = longBio
+    ? longBio
+        .split(/\n{2,}/)
+        .map((chunk) => chunk.trim())
+        .filter((chunk) => chunk.length > 0)
+    : null
 
   return (
     <article className="detail-page person-detail">
@@ -110,13 +188,50 @@ const Person = () => {
 
       {error && !notFound && <p className="error-state">{error}</p>}
 
-      <section className="echoes">
-        <h2>Why they matter</h2>
-        <p>
-          Letters, proclamations, and folklore capture how their decisions steered dynasties, raised monuments, and
-          reshaped belief across these islands.
-        </p>
-      </section>
+      {(quote || mainSite || lifespan || rolesLine) && (
+        <section className="at-a-glance">
+          <h2>At a glance</h2>
+          {quote && (
+            <blockquote className="figure-quote">
+              <p>{quote}</p>
+            </blockquote>
+          )}
+          <ul className="figure-fact-list">
+            {mainSite && (
+              <li>
+                <strong>Most associated with:</strong> {mainSite}
+              </li>
+            )}
+            {lifespan && (
+              <li>
+                <strong>Lifespan:</strong> {lifespan}
+              </li>
+            )}
+            {rolesLine && (
+              <li>
+                <strong>Roles:</strong> {rolesLine}
+              </li>
+            )}
+          </ul>
+        </section>
+      )}
+
+      {longBioParagraphs && longBioParagraphs.length > 0 ? (
+        <section className="echoes">
+          <h2>Life &amp; legacy</h2>
+          {longBioParagraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </section>
+      ) : (
+        <section className="echoes">
+          <h2>Why they matter</h2>
+          <p>
+            Letters, proclamations, and folklore capture how their decisions steered dynasties, raised monuments, and
+            reshaped belief across these islands.
+          </p>
+        </section>
+      )}
       <Link className="button" to="/people">
         Back to all people
       </Link>

@@ -49,14 +49,36 @@ export interface AuthLoginRequest {
   password: string
 }
 
+export interface FigureContext {
+  id: number
+  figure_slug: string
+  source_name?: string | null
+  source_url?: string | null
+  content_type?: string | null
+  content: string
+  is_manual: number
+}
+
 export interface HistoricalFigure {
+  id?: number
   slug: string
   name: string
-  era_primary?: string
-  summary?: string
-  teaser?: string
-  image_url?: string
-  tags?: string[]
+  era?: string | null
+  roles?: string | string[] | null
+  image_url?: string | null
+  short_summary?: string | null
+  persona_prompt?: string | null
+  long_bio?: string | null
+  echo_story?: string | null
+  quote?: string | null
+  birth_year?: number | null
+  death_year?: number | null
+  main_site?: string | null
+  related_sites?: string[] | string | null
+  sources?: Record<string, unknown> | null
+  wiki_links?: Record<string, string> | null
+  verified?: boolean | number | null
+  contexts?: FigureContext[]
 }
 
 export interface FavoriteFigure {

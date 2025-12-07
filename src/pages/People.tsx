@@ -7,11 +7,22 @@ import { resolveMediaUrl } from '../utils/media'
 
 const fallbackFigureImage = '/images/figure-fallback.svg'
 
-const buildEra = (figure: Partial<HistoricalFigure>): string =>
-  figure.era_primary ?? figure.primaryEra ?? ''
+type LegacyFigureFields = {
+  era_primary?: string
+  primaryEra?: string
+  summary?: string
+  teaser?: string
+  imageUrl?: string
+}
 
-const buildTeaser = (figure: Partial<HistoricalFigure>): string =>
-  figure.teaser ?? figure.summary ?? 'Profile coming soon.'
+type FigureDisplay = HistoricalFigure & LegacyFigureFields
+
+const buildEra = (figure: Partial<HistoricalFigure & { era_primary?: string; primaryEra?: string }>): string =>
+  figure.era ?? figure.era_primary ?? figure.primaryEra ?? ''
+
+const buildTeaser = (
+  figure: Partial<HistoricalFigure & { summary?: string; teaser?: string }>,
+): string => figure.short_summary ?? figure.teaser ?? figure.summary ?? 'Profile coming soon.'
 
 const People = () => {
   const [figures, setFigures] = useState<HistoricalFigure[]>([])
@@ -60,7 +71,8 @@ const People = () => {
     )
   }
 
-  const activeFigures = figures.length > 0 ? figures : FIGURES
+  const activeFigures: FigureDisplay[] =
+    (figures.length > 0 ? figures : (FIGURES as FigureDisplay[])) as FigureDisplay[]
 
   return (
     <section className="list-page">
@@ -77,7 +89,7 @@ const People = () => {
       ) : (
         <ul className="card-list">
           {activeFigures.map((figure) => {
-            const portrait = figure.image_url ?? (figure as { imageUrl?: string }).imageUrl
+            const portrait = figure.image_url ?? figure.imageUrl
             const portraitSrc = resolveMediaUrl(portrait) ?? fallbackFigureImage
             const era = buildEra(figure)
             const teaser = buildTeaser(figure)
