@@ -147,9 +147,10 @@ span {
 }
 
 .site-header {
-  background: var(--pit-teal);
-  color: #f4f5f7;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  background: #ffffff;
+  color: var(--pit-teal-strong);
+  border-bottom: 1px solid rgba(5, 6, 12, 0.08);
+  box-shadow: 0 6px 24px rgba(5, 6, 12, 0.04);
 }
 
 .header-inner {
@@ -168,11 +169,12 @@ span {
   font-family: var(--pit-font-body);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #f4f5f7;
+  color: var(--pit-teal-strong);
 }
 
 .brand-mark {
   flex-shrink: 0;
+  color: inherit;
 }
 
 .brand-text {
@@ -195,16 +197,16 @@ span {
   padding: 0.4rem 1rem;
   border-radius: var(--pit-radius-pill);
   border: 1px solid transparent;
-  color: #f4f5f7;
+  color: var(--pit-teal-strong);
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .nav-link:hover {
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(15, 76, 92, 0.3);
 }
 
 .nav-link.is-active {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(15, 76, 92, 0.1);
 }
 
 .site-main {
@@ -238,6 +240,26 @@ span {
 .site-footer a {
   color: rgba(255, 255, 255, 0.92);
   font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .site-footer {
+    background: #ffffff;
+    color: var(--pit-ink);
+    border-top: var(--pit-stroke) solid rgba(5, 6, 12, 0.08);
+  }
+
+  .site-footer p {
+    color: var(--pit-ink-soft);
+  }
+
+  .site-footer a {
+    color: var(--pit-teal);
+  }
+
+  .site-footer .brand-mark {
+    color: var(--pit-teal);
+  }
 }
 
 .button-row {

@@ -17,7 +17,7 @@ const AppLayout = ({ children }) => {
       <header className="site-header">
         <div className="content-container header-inner">
           <NavLink to="/" className="brand" aria-label="Places in Time home">
-            <LogoMark tone="light" size={48} className="brand-mark" />
+            <LogoMark tone="currentColor" size={48} className="brand-mark" />
             <span className="brand-text">
               <span className="brand-line">Places</span>
               <span className="brand-line">in Time</span>
@@ -44,7 +44,7 @@ const AppLayout = ({ children }) => {
       <footer className="site-footer">
         <div className="content-container footer-grid">
           <div className="footer-brand">
-            <LogoMark tone="light" size={56} className="brand-mark" />
+            <LogoMark tone="currentColor" size={56} className="brand-mark" />
             <div>
               <p className="eyebrow">Places in Time</p>
               <p>

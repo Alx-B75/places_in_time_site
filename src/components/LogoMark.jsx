@@ -5,7 +5,8 @@ const LogoMark = ({ tone = 'teal', size = 48, className = '', hideTitle = false 
     light: '#ffffff',
   }
 
-  const strokeColor = toneMap[tone] ?? toneMap.teal
+  const toneKey = tone ?? 'teal'
+  const strokeColor = toneMap[toneKey] ?? toneKey
   const titleId = hideTitle ? undefined : 'places-in-time-logo'
 
   return (
