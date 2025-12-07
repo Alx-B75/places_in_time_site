@@ -22,7 +22,7 @@ const LogoMark = ({ tone = 'teal', size = 48, className = '', hideTitle = false 
       <g
         fill="none"
         stroke={strokeColor}
-        strokeWidth={56}
+        strokeWidth={44}
         strokeLinecap="round"
         strokeLinejoin="round"
       >
