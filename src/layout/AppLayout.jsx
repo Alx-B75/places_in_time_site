@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import LogoMark from '../components/LogoMark'
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -15,8 +16,12 @@ const AppLayout = ({ children }) => {
     <div className="app-shell">
       <header className="site-header">
         <div className="content-container header-inner">
-          <NavLink to="/" className="brand">
-            Places in Time
+          <NavLink to="/" className="brand" aria-label="Places in Time home">
+            <LogoMark tone="light" size={48} className="brand-mark" />
+            <span className="brand-text">
+              <span className="brand-line">Places</span>
+              <span className="brand-line">in Time</span>
+            </span>
           </NavLink>
           <nav className="site-nav">
             {navLinks.map((link) => (
@@ -38,12 +43,15 @@ const AppLayout = ({ children }) => {
       </main>
       <footer className="site-footer">
         <div className="content-container footer-grid">
-          <div>
-            <p className="eyebrow">Places in Time</p>
-            <p>
-              A design system for historical storytelling products. Layer maps, people, and guided chat into one atlas.
-            </p>
-            <small>© {currentYear} Places in Time</small>
+          <div className="footer-brand">
+            <LogoMark tone="light" size={56} className="brand-mark" />
+            <div>
+              <p className="eyebrow">Places in Time</p>
+              <p>
+                A design system for historical storytelling products. Layer maps, people, and guided chat into one atlas.
+              </p>
+              <small>© {currentYear} Places in Time</small>
+            </div>
           </div>
           <div>
             <p className="eyebrow">Explore</p>
