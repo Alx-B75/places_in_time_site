@@ -544,6 +544,13 @@ export class ApiClient {
           searchParams.append('content_type', type)
         }
       })
+    }
+    const query = searchParams.toString()
+    const path = query ? `/places?${query}` : '/places'
+    const data = await this.request<Place[] | { items?: Place[] }>(path, { method: 'GET' })
+    if (Array.isArray(data)) {
+      return data
+    }
     return data.items ?? []
   }
 
