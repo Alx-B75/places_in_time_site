@@ -12,7 +12,6 @@ const FeaturedPlacesCard = ({ place }) => {
     title = 'Untitled place',
     summary = '/* TODO: add real summary */',
     location = 'Location forthcoming',
-    highlight,
     image,
     imageAlt,
   } = place
@@ -33,7 +32,6 @@ const FeaturedPlacesCard = ({ place }) => {
         <p>{summary}</p>
         <div className="card-meta">
           <strong>{location}</strong>
-          {highlight && <p>{highlight}</p>}
         </div>
       </article>
     </Link>

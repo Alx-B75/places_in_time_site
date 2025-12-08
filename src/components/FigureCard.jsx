@@ -1,16 +1,27 @@
+import { Link } from 'react-router-dom'
+
+const truncateSummary = (text = '', max = 150) => {
+  const clean = text.trim()
+  if (!clean) return ''
+  const snippet = clean.length > max ? clean.slice(0, max).trimEnd() : clean
+  return `${snippet}…`
+}
+
 const FigureCard = ({ figure }) => {
   if (!figure) {
     return null
   }
 
   const {
+    slug,
     era = 'Era soon',
     name = 'Unnamed figure',
-    title = '/* TODO: add role */',
-    summary = '/* TODO: add bio */',
+    summary = 'Details arriving soon.',
     image,
     accent = 'medieval',
   } = figure
+
+  const preview = truncateSummary(summary)
 
   return (
     <article className="figure-card">
@@ -23,8 +34,12 @@ const FigureCard = ({ figure }) => {
       )}
       <span className={`era-chip ${accent}`}>{era}</span>
       <h3>{name}</h3>
-      <p>{summary}</p>
-      <small>{title}</small>
+      {preview && <p>{preview}</p>}
+      {slug && (
+        <Link to={`/people/${slug}`} className="pill-button">
+          Read more
+        </Link>
+      )}
     </article>
   )
 }

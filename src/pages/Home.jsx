@@ -31,6 +31,21 @@ const figureImagery = {
   aethelflaed: 'https://images.unsplash.com/photo-1437913135140-944c1ee62782?auto=format&fit=crop&w=800&q=60',
 }
 
+const shopProducts = [
+  {
+    id: 'shield-wall-print',
+    title: 'Saxon Shield Wall Print',
+    image: 'https://ih1.redbubble.net/image.5749775065.5694/raf,360x360,075,t,fafafa:ca443f4786.u4.jpg',
+    link: 'https://www.redbubble.com/i/photographic-print/Saxon-shield-wall-print-by-Alex-Bunting/167965694.6Q0TX',
+  },
+  {
+    id: 'lindisfarne-sticker',
+    title: 'Lindisfarne 793 Sticker',
+    image: 'https://ih1.redbubble.net/image.5865031963.3430/raf,360x360,075,t,fafafa:ca443f4786.u2.jpg',
+    link: 'https://www.redbubble.com/i/sticker/Lindisfarne-793-Row-Hard-Raid-Harder-Viking-Humour-T-Shirt-by-Alex-Bunting/171693430.EJUG5',
+  },
+]
+
 const placeImagery = {
   bosworth: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=60',
   stonehenge: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=60',
@@ -44,11 +59,19 @@ const defaultPlaceImage = 'https://images.unsplash.com/photo-1500530855697-b586d
 
 const accentFromEra = (primaryEra) => {
   if (!primaryEra) return 'modern'
-  if (primaryEra.includes('neolithic')) return 'neolithic'
-  if (primaryEra.includes('roman')) return 'roman'
-  if (primaryEra.includes('medieval')) return 'medieval'
-  if (primaryEra.includes('renaissance') || primaryEra.includes('tudor')) return 'renaissance'
+  const era = primaryEra.toLowerCase()
+  if (era.includes('neolithic')) return 'neolithic'
+  if (era.includes('roman')) return 'roman'
+  if (era.includes('medieval')) return 'medieval'
+  if (era.includes('renaissance') || era.includes('tudor')) return 'renaissance'
   return 'modern'
+}
+
+const truncateSummary = (text = '', max = 150) => {
+  const clean = text.trim()
+  if (!clean) return ''
+  const snippet = clean.length > max ? clean.slice(0, max).trimEnd() : clean
+  return `${snippet}…`
 }
 
 const featuredSlugOrder = ['bosworth', 'stonehenge', 'hadrians-wall', 'edinburgh-castle']
@@ -62,18 +85,17 @@ const featuredPlaces = [...prioritizedPlaces, ...fallbackPlaces].slice(0, 4).map
   title: place.name,
   era: place.era_primary,
   accent: accentFromEra(place.primaryEra ?? ''),
-  summary: place.teaser ?? place.summaries?.gen,
+  summary: truncateSummary(place.summaries?.gen ?? place.teaser ?? ''),
   location: place.location_label,
-  highlight: place.echo?.title ?? place.types?.join(', '),
   image: place.hero_image || placeImagery[place.slug] || place.echo_image || defaultPlaceImage,
   imageAlt: `Hero view of ${place.name}${place.location_label ? ` — ${place.location_label}` : ''}`,
 }))
 
 const figurePreviews = FIGURES.slice(0, 4).map((figure) => ({
+  slug: figure.slug,
   name: figure.name,
   era: figure.primaryEra?.replace('-', ' ') ?? 'Era upcoming',
-  title: figure.slug === 'aethelflaed' ? 'Lady of the Mercians' : figure.slug === 'saint-aidan' ? 'Missionary Bishop' : 'Key Figure',
-  summary: figure.teaser,
+  summary: figure.summary ?? figure.teaser ?? '',
   image: figureImagery[figure.slug],
   accent: accentFromEra(figure.primaryEra ?? ''),
 }))
@@ -126,9 +148,6 @@ const chatMessages = [
 ]
 
 const Home = () => {
-  const totalPlaces = PLACES.length
-  const totalFigures = FIGURES.length
-
   return (
     <>
       <section className="home-hero">
@@ -150,16 +169,6 @@ const Home = () => {
               <Link className="button" to="/chat">
                 Talk to the archives
               </Link>
-            </div>
-            <div className="hero-stat-grid">
-              <div className="hero-stat">
-                <strong>{totalPlaces}</strong>
-                <p>Curated locations ready for launch</p>
-              </div>
-              <div className="hero-stat">
-                <strong>{totalFigures}+</strong>
-                <p>Figures paired with site timelines</p>
-              </div>
             </div>
           </div>
           <HeroBanner
@@ -204,6 +213,34 @@ const Home = () => {
         <div className="figure-grid">
           {figurePreviews.map((figure) => (
             <FigureCard key={figure.name} figure={figure} />
+          ))}
+        </div>
+      </section>
+
+      <section className="home-shop">
+        <div className="home-shop-copy">
+          <p className="eyebrow">Threads in Time</p>
+          <h2>Wear the stories we map</h2>
+          <p>Welcome to Threads in Time — a growing collection of historically inspired designs from Places in Time.</p>
+          <p>Each piece is part of our journey through the past, with new designs added regularly.</p>
+          <p>
+            If there’s a place, figure, or moment you’d love to see brought to life, let us know. You are welcome to send us a message. We’re
+            always open to ideas from fellow time travelers.
+          </p>
+        </div>
+        <div className="home-shop-products">
+          {shopProducts.map((product) => (
+            <article key={product.id} className="shop-product-card">
+              {product.image && (
+                <div className="shop-product-media">
+                  <img src={product.image} alt={`${product.title} preview`} loading="lazy" />
+                </div>
+              )}
+              <h3>{product.title}</h3>
+              <a className="button" href={product.link} target="_blank" rel="noreferrer">
+                View on Redbubble
+              </a>
+            </article>
           ))}
         </div>
       </section>
