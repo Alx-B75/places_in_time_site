@@ -373,6 +373,43 @@ span {
   }
 }
 
+.home-hero-visual {
+  margin: 0;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  position: relative;
+  background: var(--pit-paper-strong);
+  border: 1px solid rgba(5, 6, 12, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.home-hero-visual img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.home-hero-visual-meta {
+  padding: var(--pit-space-3);
+  background: linear-gradient(180deg, rgba(15, 76, 92, 0.92), rgba(12, 24, 36, 0.95));
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pit-space-2);
+}
+
+.home-hero-visual-meta blockquote {
+  margin: 0;
+  font-family: var(--pit-font-heading);
+  font-size: 1.4rem;
+}
+
+.home-hero-visual-meta small {
+  opacity: 0.9;
+}
+
 .hero-overlay {
   position: absolute;
   border-radius: 999px;

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import HeroBanner from '../components/HeroBanner'
 import FeaturedPlacesCard from '../components/FeaturedPlacesCard'
 import FigureCard from '../components/FigureCard'
 import EchoSnippet from '../components/EchoSnippet'
@@ -232,13 +231,21 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <HeroBanner
-            quote="“Maps remember more than borders—they remember intent.”"
-            chipLabel="Echo Archive"
-            chipTone="renaissance"
-            description="Layer gradient overlays, stroke arcs, and safe zones to showcase photography, satellite traces, or reconstructions."
-            caption="Visual guidelines travel with every market rollout."
-          />
+          <figure className="home-hero-visual">
+            <img
+              src="/images/home/homepagebanner.png"
+              alt="Places in Time collage showcasing the atlas design system"
+              loading="eager"
+            />
+            <figcaption className="home-hero-visual-meta">
+              <span className="era-chip renaissance">Echo Archive</span>
+              <blockquote>“Maps remember more than borders—they remember intent.”</blockquote>
+              <p>
+                Gradient overlays, tracing strokes, and caption rails keep photography, reconstructions, and satellite data within the brand grid.
+              </p>
+              <small>Visual guidelines travel with every market rollout.</small>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
