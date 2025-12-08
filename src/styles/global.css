@@ -235,7 +235,7 @@ span {
 
 @media (min-width: 768px) {
   .site-footer .footer-inner {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     align-items: flex-start;
   }
 }
@@ -250,6 +250,18 @@ span {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+}
+
+.footer-brand-column {
+  min-width: 220px;
+}
+
+.footer-tagline {
+  margin: 0.35rem 0 0;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .site-footer .brand-mark {

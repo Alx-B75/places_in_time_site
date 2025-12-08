@@ -358,22 +358,39 @@ const Home = () => {
       <section className="home-about">
         <div className="home-about-copy">
           <p className="eyebrow">About Places in Time</p>
-          <h2>Why we map people, echoes, and terrain together</h2>
+          <h2>Our story</h2>
           <p>
-            Places in Time is a studio project documenting Britain through multidisciplinary research: architectural surveys,
-            oral histories, predictive cartography, and guided chat. The About page outlines our methodology, ethics guardrails,
-            and how regional partners can plug into the system.
+            At Places in Time, history isn’t just something you read — it’s something you feel. Our journey began with a simple belief:
+            the past isn’t dead, it leaves echoes in the places it happened. From windswept battlefields to silent standing stones,
+            those echoes are all around us — waiting to be heard, felt, and understood.
           </p>
           <p>
-            It also introduces the team curating the atlas—designers, historians, and technologists who believe cultural heritage
-            should be generous, citation-rich, and accessible.
+            We believe that to truly understand the people of the past — their choices, triumphs, and tragedies — you need to walk where they walked.
+            To stand where they stood. It’s only when your feet touch the same ground that you begin to grasp the weight of their decisions
+            and the world they lived in.
+          </p>
+          <p>
+            Places in Time was founded by a lifelong explorer of stories, myths, and real events. Frustrated by how often history feels distant and abstract,
+            we set out to reconnect people — especially the next generation — with the landscapes that shaped our world.
+          </p>
+          <p>
+            We began with some of the UK’s most iconic historical locations. Rather than just presenting facts, we pair each place with the figures who made it matter:
+            Roman commanders, Saxon queens, rebel plotters, druid priests, and more. You’ll meet them, hear their stories, and even talk to them through
+            our interactive Voices from the Past.
+          </p>
+          <p>
+            Our mission is simple: to make history real. To tell forgotten tales. To invite you into the world that once was — and to help you see the past with new eyes.
+          </p>
+          <p>
+            This is just the beginning. Whether you’re a student, a teacher, a curious explorer, or a time-traveling dreamer, Places in Time is here to bring history to life — one place,
+            one story, one voice at a time.
           </p>
           <Link className="button" to="/about">
             Read more
           </Link>
         </div>
         <div className="home-about-media">
-          <img src="/images/home/about-hero.jpg" alt="Curators collaborating inside the Places in Time studio" loading="lazy" />
+          <img src="/images/home/our_story.png" alt="Collage illustrating the Places in Time origin story" loading="lazy" />
         </div>
       </section>
 

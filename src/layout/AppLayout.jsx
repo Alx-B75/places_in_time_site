@@ -69,7 +69,7 @@ const AppLayout = ({ children }) => {
       <footer className="site-footer">
         <div className="content-container">
           <div className="footer-inner">
-            <div className="footer-column">
+            <div className="footer-column footer-brand-column">
               <div className="footer-brand">
                 <img
                   src="/favicon.svg"
@@ -82,27 +82,26 @@ const AppLayout = ({ children }) => {
                 />
                 <div>
                   <p className="eyebrow">Places in Time</p>
-                  <p>
-                    A design system for historical storytelling products. Layer maps, people, and guided chat into one atlas.
-                  </p>
+                  <p className="footer-tagline">WHERE HISTORY ANSWERS BACK</p>
                 </div>
               </div>
-              <div className="footer-links">
-                <p>
-                  <NavLink to="/about">About Places in Time</NavLink>
-                </p>
-                <p>
-                  <NavLink to="/places">Places atlas</NavLink>
-                </p>
-                <p>
-                  <NavLink to="/people">Figures roster</NavLink>
-                </p>
-                <p>
-                  <NavLink to="/news">History News</NavLink>
-                </p>
-              </div>
             </div>
-            <div className="footer-column">
+            <div className="footer-column footer-links">
+              <p className="eyebrow">Explore</p>
+              <p>
+                <NavLink to="/about">About Places in Time</NavLink>
+              </p>
+              <p>
+                <NavLink to="/places">Places atlas</NavLink>
+              </p>
+              <p>
+                <NavLink to="/people">Figures roster</NavLink>
+              </p>
+              <p>
+                <NavLink to="/news">History News</NavLink>
+              </p>
+            </div>
+            <div className="footer-column footer-legal">
               <p className="eyebrow">Legal</p>
               <p>
                 <NavLink to="/privacy-policy-gdpr">Privacy & GDPR</NavLink>
@@ -114,7 +113,7 @@ const AppLayout = ({ children }) => {
                 <NavLink to="/impressum">Impressum</NavLink>
               </p>
             </div>
-            <div className="footer-column">
+            <div className="footer-column footer-social">
               <p className="eyebrow">Follow</p>
               <div className="social-links">
                 <a
