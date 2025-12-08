@@ -230,13 +230,24 @@ span {
 
 .site-footer .footer-grid {
   display: grid;
-  gap: var(--pit-space-2);
+  gap: var(--pit-space-3);
+}
+
+@media (min-width: 960px) {
+  .site-footer .footer-grid {
+    grid-template-columns: minmax(220px, 1.2fr) repeat(4, minmax(140px, 1fr));
+    align-items: flex-start;
+  }
 }
 
 .footer-brand {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+}
+
+.site-footer .footer-grid > div {
+  min-width: 0;
 }
 
 .site-footer .brand-mark {
@@ -257,6 +268,35 @@ span {
 .site-footer a {
   color: rgba(255, 255, 255, 0.92);
   font-weight: 600;
+  text-decoration: none;
+}
+
+.site-footer a:hover,
+.site-footer a:focus-visible {
+  text-decoration: underline;
+}
+
+.social-links {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.social-links a {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.95);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.social-links a:hover,
+.social-links a:focus-visible {
+  border-color: #fff;
+  transform: translateY(-2px);
 }
 
 
@@ -406,6 +446,63 @@ span {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--pit-space-3);
   margin-bottom: var(--pit-space-5);
+}
+
+.home-shop,
+.home-about {
+  display: grid;
+  gap: var(--pit-space-3);
+  margin-bottom: var(--pit-space-5);
+  border-radius: var(--pit-radius-card);
+  padding: var(--pit-space-4);
+  border: 1px solid rgba(5, 6, 12, 0.08);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), #fff);
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .home-shop,
+  .home-about {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.home-shop-media,
+.home-about-media,
+.home-history-media {
+  border-radius: var(--pit-radius-card);
+  overflow: hidden;
+  background: var(--pit-paper-strong);
+  border: 1px solid rgba(5, 6, 12, 0.06);
+}
+
+.home-shop-media img,
+.home-about-media img,
+.home-history-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.home-shop-copy,
+.home-about-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pit-space-2);
+}
+
+.home-shop .button,
+.home-about .button {
+  align-self: flex-start;
+}
+
+.home-history-news {
+  margin-bottom: var(--pit-space-5);
+}
+
+.home-history-media {
+  margin-bottom: var(--pit-space-3);
 }
 
 .featured-card,

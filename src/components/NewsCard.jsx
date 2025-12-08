@@ -12,7 +12,7 @@ const NewsCard = ({ item }) => {
       <h3>{item.title}</h3>
       <p>{item.summary}</p>
       {item.link && (
-        <a className="news-link" href={item.link} target="_blank" rel="noreferrer">
+        <a className="news-link" href={item.link} target="_blank" rel="noopener noreferrer">
           Read update
         </a>
       )}

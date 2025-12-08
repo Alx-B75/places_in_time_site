@@ -35,27 +35,27 @@ const featuredSlugOrder = ['bosworth', 'stonehenge', 'hadrians-wall', 'edinburgh
 const newsItems = [
   {
     id: 'n1',
-    title: 'Design tokens locked for v1 launch',
+    title: 'Dispatches from active excavations',
     dateLabel: '05 Dec 2025',
-    category: 'Design',
-    summary: 'Colour, typography, and spacing tokens now drive the entire layout and component library.',
-    link: '#',
+    category: 'Field report',
+    summary: 'Weekly correspondents surface context from digs, court records, and museum releases.',
+    link: 'https://places-in-time.com/history-news/',
   },
   {
     id: 'n2',
-    title: 'Atlas hero rebuilt for 21:9 storytelling',
+    title: 'Policy shifts that reshape heritage',
     dateLabel: '02 Dec 2025',
-    category: 'Product',
-    summary: 'Hero section now mirrors the production overlay grid so media swaps remain on-brand.',
-    link: '#',
+    category: 'Briefing',
+    summary: 'Track how funding rounds, stewardship debates, and access pilots change visiting rights.',
+    link: 'https://places-in-time.com/history-news/',
   },
   {
     id: 'n3',
-    title: 'Shop integration prep underway',
+    title: 'Voices from local historians',
     dateLabel: '29 Nov 2025',
-    category: 'Operations',
-    summary: 'Merchandise catalog requirements drafted; storefront stub online for stakeholder review.',
-    link: '#',
+    category: 'Perspective',
+    summary: 'Hear regional researchers explain why certain archives, trails, or rituals matter now.',
+    link: 'https://places-in-time.com/history-news/',
   },
 ]
 
@@ -192,7 +192,7 @@ const Home = () => {
   })
 
   const echoSnippets = activePlaces.slice(0, 3).map((place) => ({
-    text: place.echo_text ?? place.echo?.text ?? '/* TODO: add echo */',
+    text: place.echo_text ?? place.echo?.text ?? 'Fresh echo arriving soon.',
     source: place.echo_title ?? place.echo?.title ?? place.name,
   }))
 
@@ -278,13 +278,46 @@ const Home = () => {
         </div>
       </section>
 
-      <section>
-        <div className="section-header">
-          <p className="eyebrow">Latest News</p>
-          <h2>Blueprint progress reports</h2>
+      <section className="home-shop">
+        <div className="home-shop-media">
+          <img
+            src="/images/home/shop-hero.jpg"
+            alt="Preview of Places in Time shop designs"
+            loading="lazy"
+          />
+        </div>
+        <div className="home-shop-copy">
+          <p className="eyebrow">Shop – support Places in Time</p>
+          <h2>Field-inspired goods that fund new stories</h2>
           <p>
-            Track design sign-offs, content drops, and release prep without leaving the homepage. Swap this stub for the CMS feed when ready.
+            The shop curates limited prints, notebooks, and tactile tools that echo the palette and typography of the atlas.
+            Every order helps underwrite new oral histories, photo essays, and archival clearances so the map keeps expanding.
           </p>
+          <a
+            className="button primary"
+            href="https://places-in-time.com/shop/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Visit the shop
+          </a>
+        </div>
+      </section>
+
+      <section className="home-history-news">
+        <div className="section-header">
+          <p className="eyebrow">History news & context</p>
+          <h2>Read the dispatches shaping today’s visits</h2>
+          <p>
+            Our editorial desk monitors excavations, policy moves, and community storytelling. These quick briefs point to the full feed so you can dive deeper.
+          </p>
+        </div>
+        <div className="home-history-media">
+          <img
+            src="/images/home/history-news-hero.jpg"
+            alt="Collage of clippings from the History News feed"
+            loading="lazy"
+          />
         </div>
         <div className="news-grid">
           {newsItems.map((item) => (
@@ -292,9 +325,14 @@ const Home = () => {
           ))}
         </div>
         <div className="button-row">
-          <Link className="button" to="/news">
-            See all news
-          </Link>
+          <a
+            className="button"
+            href="https://places-in-time.com/history-news/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Read history news
+          </a>
         </div>
       </section>
 
@@ -329,11 +367,39 @@ const Home = () => {
         </div>
       </section>
 
+      <section className="home-about">
+        <div className="home-about-copy">
+          <p className="eyebrow">About Places in Time</p>
+          <h2>Why we map people, echoes, and terrain together</h2>
+          <p>
+            Places in Time is a studio project documenting Britain through multidisciplinary research: architectural surveys,
+            oral histories, predictive cartography, and guided chat. The About page outlines our methodology, ethics guardrails,
+            and how regional partners can plug into the system.
+          </p>
+          <p>
+            It also introduces the team curating the atlas—designers, historians, and technologists who believe cultural heritage
+            should be generous, citation-rich, and accessible.
+          </p>
+          <a
+            className="button"
+            href="https://places-in-time.com/about/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Read more
+          </a>
+        </div>
+        <div className="home-about-media">
+          <img src="/images/home/about-hero.jpg" alt="Curators collaborating inside the Places in Time studio" loading="lazy" />
+        </div>
+      </section>
+
       <section className="closing-cta">
-        <p className="eyebrow">Ready to launch</p>
-        <h2>Preview the production build or tailor it to your region.</h2>
+        <p className="eyebrow">Ready to explore</p>
+        <h2>Plan a visit, brief the chatbot, or share the atlas.</h2>
         <p>
-          Swap in your CMS data, configure backend endpoints, and keep the stroke language intact to preserve the visual rhythm across hero, cards, and chat.
+          Follow a thread from a featured place to its people, then hand the conversation to Talk to History for deeper itineraries and citations.
+          Every route keeps the design system intact so the story feels coherent on any device.
         </p>
         <div className="button-row" style={{ justifyContent: 'center' }}>
           <Link className="button primary" to="/places">
