@@ -147,10 +147,10 @@ span {
 }
 
 .site-header {
-  background: #ffffff;
-  color: var(--pit-teal-strong);
-  border-bottom: 1px solid rgba(5, 6, 12, 0.08);
-  box-shadow: 0 6px 24px rgba(5, 6, 12, 0.04);
+  background: var(--pit-teal);
+  color: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 24px rgba(5, 6, 12, 0.22);
 }
 
 .header-inner {
@@ -169,7 +169,7 @@ span {
   font-family: var(--pit-font-body);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--pit-teal-strong);
+  color: rgba(255, 255, 255, 0.94);
 }
 
 .brand-mark {
@@ -199,17 +199,19 @@ span {
 .nav-link {
   padding: 0.4rem 1rem;
   border-radius: var(--pit-radius-pill);
-  border: 1px solid transparent;
-  color: var(--pit-teal-strong);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.9);
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .nav-link:hover {
-  border-color: rgba(15, 76, 92, 0.3);
+  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .nav-link.is-active {
-  background: rgba(15, 76, 92, 0.1);
+  background: rgba(255, 255, 255, 0.28);
+  border-color: transparent;
 }
 
 .site-main {
@@ -242,7 +244,7 @@ span {
 
 .site-footer p {
   margin: 0.25rem 0;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .site-footer a {
@@ -250,25 +252,6 @@ span {
   font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-  .site-footer {
-    background: #ffffff;
-    color: var(--pit-ink);
-    border-top: var(--pit-stroke) solid rgba(5, 6, 12, 0.08);
-  }
-
-  .site-footer p {
-    color: var(--pit-ink-soft);
-  }
-
-  .site-footer a {
-    color: var(--pit-teal);
-  }
-
-  .site-footer .brand-mark {
-    color: var(--pit-teal);
-  }
-}
 
 .button-row {
   display: flex;
