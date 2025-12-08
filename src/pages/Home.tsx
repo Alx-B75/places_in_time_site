@@ -33,6 +33,21 @@ const valueProps = [
 
 const featuredSlugOrder = ['bosworth', 'stonehenge', 'hadrians-wall', 'edinburgh-castle']
 
+const shopProducts = [
+  {
+    id: 'shield-wall-print',
+    title: 'Saxon Shield Wall Print',
+    image: 'https://ih1.redbubble.net/image.5749775065.5694/raf,360x360,075,t,fafafa:ca443f4786.u4.jpg',
+    link: 'https://www.redbubble.com/i/photographic-print/Saxon-shield-wall-print-by-Alex-Bunting/167965694.6Q0TX',
+  },
+  {
+    id: 'lindisfarne-sticker',
+    title: 'Lindisfarne 793 Sticker',
+    image: 'https://ih1.redbubble.net/image.5865031963.3430/raf,360x360,075,t,fafafa:ca443f4786.u2.jpg',
+    link: 'https://www.redbubble.com/i/sticker/Lindisfarne-793-Row-Hard-Raid-Harder-Viking-Humour-T-Shirt-by-Alex-Bunting/171693430.EJUG5',
+  },
+]
+
 
 const chatMessages = [
   { id: 'm1', role: 'user', text: 'What did the ravens really mean to warders at the Tower?' },
@@ -61,6 +76,15 @@ const accentFromEra = (primaryEra?: string): string => {
   return 'modern'
 }
 
+const truncateCopy = (text?: string | null, max = 150): string => {
+  const clean = text?.trim()
+  if (!clean) {
+    return ''
+  }
+  const snippet = clean.length > max ? clean.slice(0, max).trimEnd() : clean
+  return `${snippet}…`
+}
+
 const buildLocation = (place: Place): string => {
   if (place.location_label) return place.location_label
   if (place.locationLabel) return place.locationLabel
@@ -70,11 +94,10 @@ const buildLocation = (place: Place): string => {
   return ''
 }
 
-const buildPlaceSummary = (place: Place): string =>
-  place.summary_gen ?? place.summaries?.gen ?? place.summary ?? place.teaser ?? place.description ?? ''
-
-const buildPlaceHighlight = (place: Place): string | undefined =>
-  place.echo_title ?? place.echo?.title ?? place.types?.join(', ')
+const buildPlaceSummary = (place: Place): string => {
+  const source = place.summary_gen ?? place.summaries?.gen ?? place.summary ?? place.teaser ?? place.description ?? ''
+  return truncateCopy(source)
+}
 
 const getHeroImage = (place: Place): string | null | undefined =>
   place.hero_image ?? place.heroImage ?? place.echo_image ?? place.echoImage
@@ -83,7 +106,7 @@ const getFigureEra = (figure: HistoricalFigureLike): string =>
   figure.era_primary ?? figure.primaryEra ?? ''
 
 const getFigureSummary = (figure: HistoricalFigureLike): string =>
-  figure.teaser ?? figure.summary ?? 'More details arriving soon.'
+  figure.summary ?? figure.short_summary ?? figure.teaser ?? 'More details arriving soon.'
 
 const getFigurePortrait = (figure: HistoricalFigureLike): string | undefined =>
   figure.image_url ?? figure.imageUrl
@@ -158,7 +181,6 @@ const Home = () => {
       accent: accentFromEra(era),
       summary: buildPlaceSummary(place),
       location,
-      highlight: buildPlaceHighlight(place),
       image,
       imageAlt: `Hero view of ${place.name}${location ? ` — ${location}` : ''}`,
     }
@@ -170,9 +192,9 @@ const Home = () => {
     const image = resolveMediaUrl(portrait) ?? fallbackFigureImage
 
     return {
+      slug: figure.slug,
       name: figure.name,
       era: era ? era.replace('-', ' ') : 'Era upcoming',
-      title: figure.slug === 'aethelflaed' ? 'Lady of the Mercians' : figure.slug === 'saint-aidan' ? 'Missionary Bishop' : 'Key Figure',
       summary: getFigureSummary(figure),
       image,
       accent: accentFromEra(era),
@@ -185,9 +207,6 @@ const Home = () => {
   }))
 
   const newsItems = newsFeed.length > 0 ? newsFeed.slice(0, 3).map((item) => toNewsCardItem(item)) : NEWS_FALLBACK_ITEMS
-
-  const totalPlaces = places.length > 0 ? places.length : activePlaces.length
-  const totalFigures = figures.length > 0 ? figures.length : activeFigures.length
 
   return (
     <>
@@ -210,16 +229,6 @@ const Home = () => {
               <Link className="button" to="/chat">
                 Talk to the archives
               </Link>
-            </div>
-            <div className="hero-stat-grid">
-              <div className="hero-stat">
-                <strong>{totalPlaces}</strong>
-                <p>Curated locations ready for launch</p>
-              </div>
-              <div className="hero-stat">
-                <strong>{totalFigures}+</strong>
-                <p>Figures paired with site timelines</p>
-              </div>
             </div>
           </div>
           <figure className="home-hero-visual">
@@ -277,23 +286,30 @@ const Home = () => {
       </section>
 
       <section className="home-shop">
-        <div className="home-shop-media">
-          <img
-            src="/images/home/shop-hero.jpg"
-            alt="Preview of Places in Time shop designs"
-            loading="lazy"
-          />
-        </div>
         <div className="home-shop-copy">
-          <p className="eyebrow">Shop – support Places in Time</p>
-          <h2>Field-inspired goods that fund new stories</h2>
+          <p className="eyebrow">Threads in Time</p>
+          <h2>Wear the stories we map</h2>
+          <p>Welcome to Threads in Time — a growing collection of historically inspired designs from Places in Time.</p>
+          <p>Each piece is part of our journey through the past, with new designs added regularly.</p>
           <p>
-            The shop curates limited prints, notebooks, and tactile tools that echo the palette and typography of the atlas.
-            Every order helps underwrite new oral histories, photo essays, and archival clearances so the map keeps expanding.
+            If there’s a place, figure, or moment you’d love to see brought to life, let us know. You are welcome to send us a message. We’re always open to ideas from
+            fellow time travelers.
           </p>
-          <Link className="button primary" to="/shop">
-            Visit the shop
-          </Link>
+        </div>
+        <div className="home-shop-products">
+          {shopProducts.map((product) => (
+            <article key={product.id} className="shop-product-card">
+              {product.image && (
+                <div className="shop-product-media">
+                  <img src={product.image} alt={`${product.title} preview`} loading="lazy" />
+                </div>
+              )}
+              <h3>{product.title}</h3>
+              <a className="button" href={product.link} target="_blank" rel="noreferrer">
+                View on Redbubble
+              </a>
+            </article>
+          ))}
         </div>
       </section>
 
