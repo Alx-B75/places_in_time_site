@@ -12,25 +12,29 @@ import About from './pages/About.tsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.tsx'
 import TermsOfUse from './pages/TermsOfUse.tsx'
 import Impressum from './pages/Impressum.tsx'
+import CookieBanner from './components/CookieBanner.tsx'
 
 const App = () => {
   return (
-    <AppLayout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/places" element={<Places />} />
-        <Route path="/places/:slug" element={<Place />} />
-        <Route path="/people" element={<People />} />
-        <Route path="/people/:slug" element={<Person />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/privacy-policy-gdpr" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-use" element={<TermsOfUse />} />
-        <Route path="/impressum" element={<Impressum />} />
-      </Routes>
-    </AppLayout>
+    <>
+      <AppLayout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/places" element={<Places />} />
+          <Route path="/places/:slug" element={<Place />} />
+          <Route path="/people" element={<People />} />
+          <Route path="/people/:slug" element={<Person />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy-policy-gdpr" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-use" element={<TermsOfUse />} />
+          <Route path="/impressum" element={<Impressum />} />
+        </Routes>
+      </AppLayout>
+      <CookieBanner />
+    </>
   )
 }
 
