@@ -7,7 +7,7 @@ import People from './pages/People.tsx'
 import Person from './pages/Person.tsx'
 import Chat from './pages/Chat.jsx'
 import Shop from './pages/Shop.jsx'
-import News from './pages/News.jsx'
+import News from './pages/News.tsx'
 
 const App = () => {
   return (

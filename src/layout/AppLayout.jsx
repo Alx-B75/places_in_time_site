@@ -6,10 +6,7 @@ const navLinks = [
   { to: '/people', label: 'People' },
   { to: '/chat', label: 'Talk to History' },
   { to: '/shop', label: 'Shop' },
-  {
-    href: 'https://places-in-time.com/history-news/',
-    label: 'History News',
-  },
+  { to: '/news', label: 'History News' },
 ]
 
 const AppLayout = ({ children }) => {
@@ -115,13 +112,7 @@ const AppLayout = ({ children }) => {
               </a>
             </p>
             <p>
-              <a
-                href="https://places-in-time.com/history-news/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                History News
-              </a>
+              <NavLink to="/news">History News</NavLink>
             </p>
           </div>
           <div>

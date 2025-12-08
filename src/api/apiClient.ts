@@ -267,6 +267,79 @@ export interface PlaceListParams {
   era?: string
 }
 
+export interface ContentMediaAsset {
+  id?: string | number
+  url?: string | null
+  alt?: string | null
+  caption?: string | null
+  credit?: string | null
+  width?: number | null
+  height?: number | null
+  kind?: string | null
+  focalPointX?: number | null
+  focalPointY?: number | null
+  [key: string]: unknown
+}
+
+export interface ContentLink {
+  label?: string | null
+  url?: string | null
+  target?: string | null
+  description?: string | null
+  icon?: string | null
+  [key: string]: unknown
+}
+
+export interface ContentItem {
+  id: string | number
+  slug: string
+  title: string
+  subtitle?: string | null
+  summary?: string | null
+  excerpt?: string | null
+  body?: string | null
+  category?: string | null
+  type?: string | null
+  tags?: string[] | null
+  status?: string | null
+  featured?: boolean | null
+  featured_rank?: number | null
+  hero_image?: string | null
+  heroImage?: string | null
+  thumbnail_image?: string | null
+  thumbnailImage?: string | null
+  promo_image?: string | null
+  promoImage?: string | null
+  published_at?: string | null
+  updated_at?: string | null
+  read_time_minutes?: number | null
+  cta_label?: string | null
+  cta_url?: string | null
+  external_url?: string | null
+  externalUrl?: string | null
+  attachments?: ContentMediaAsset[] | null
+  links?: ContentLink[] | null
+  metadata?: Record<string, unknown> | null
+  [key: string]: unknown
+}
+
+export interface ContentListParams {
+  skip?: number
+  limit?: number
+  search?: string
+  types?: string[]
+  tags?: string[]
+  category?: string
+  featured?: boolean
+  status?: string
+  before?: string
+  after?: string
+  placeSlug?: string
+  figureSlug?: string
+  sort?: string
+  order?: 'asc' | 'desc'
+}
+
 export class ApiClient {
   private baseUrl: string
 
@@ -466,6 +539,88 @@ export class ApiClient {
 
   getPlace(slug: string): Promise<Place> {
     return this.request<Place>(`/places/${encodeURIComponent(slug)}`, { method: 'GET' })
+  }
+
+  private buildContentSearchParams(params?: ContentListParams): URLSearchParams {
+    const searchParams = new URLSearchParams()
+    if (typeof params?.skip === 'number') {
+      searchParams.set('skip', String(params.skip))
+    }
+    if (typeof params?.limit === 'number') {
+      searchParams.set('limit', String(params.limit))
+    }
+    if (params?.search) {
+      searchParams.set('search', params.search)
+    }
+    params?.types?.forEach((type) => {
+      if (type) {
+        searchParams.append('type', type)
+      }
+    })
+    params?.tags?.forEach((tag) => {
+      if (tag) {
+        searchParams.append('tag', tag)
+      }
+    })
+    if (params?.category) {
+      searchParams.set('category', params.category)
+    }
+    if (typeof params?.featured === 'boolean') {
+      searchParams.set('featured', params.featured ? 'true' : 'false')
+    }
+    if (params?.status) {
+      searchParams.set('status', params.status)
+    }
+    if (params?.before) {
+      searchParams.set('before', params.before)
+    }
+    if (params?.after) {
+      searchParams.set('after', params.after)
+    }
+    if (params?.placeSlug) {
+      searchParams.set('place_slug', params.placeSlug)
+    }
+    if (params?.figureSlug) {
+      searchParams.set('figure_slug', params.figureSlug)
+    }
+    if (params?.sort) {
+      searchParams.set('sort', params.sort)
+    }
+    if (params?.order) {
+      searchParams.set('order', params.order)
+    }
+    return searchParams
+  }
+
+  async listContent(params?: ContentListParams): Promise<ContentItem[]> {
+    const searchParams = this.buildContentSearchParams(params)
+    const query = searchParams.toString()
+    const path = query ? `/content/items?${query}` : '/content/items'
+    const data = await this.request<ContentItem[] | { items?: ContentItem[] }>(path, { method: 'GET' })
+    if (Array.isArray(data)) {
+      return data
+    }
+    return data.items ?? []
+  }
+
+  listNews(params?: ContentListParams): Promise<ContentItem[]> {
+    const mergedParams: ContentListParams = {
+      limit: params?.limit ?? 12,
+      status: params?.status ?? 'published',
+      sort: params?.sort ?? 'published_at',
+      order: params?.order ?? 'desc',
+      ...params,
+    }
+
+    if (!mergedParams.types || mergedParams.types.length === 0) {
+      mergedParams.types = ['news']
+    }
+
+    return this.listContent(mergedParams)
+  }
+
+  getContentItem(slug: string): Promise<ContentItem> {
+    return this.request<ContentItem>(`/content/items/${encodeURIComponent(slug)}`, { method: 'GET' })
   }
 
   ask(payload: AskRequest, token?: string): Promise<AskResponse> {

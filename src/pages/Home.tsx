@@ -6,10 +6,12 @@ import EchoSnippet from '../components/EchoSnippet'
 import ChatPreviewBlock from '../components/ChatPreviewBlock'
 import NewsCard from '../components/NewsCard'
 import { api } from '../api'
-import type { Place, HistoricalFigure } from '../api/apiClient'
+import type { Place, HistoricalFigure, ContentItem } from '../api/apiClient'
 import { resolveMediaUrl } from '../utils/media'
+import { toNewsCardItem, type NewsCardItem } from '../utils/content'
 import { PLACES } from '../data/places'
 import { FIGURES } from '../data/figures'
+import { NEWS_FALLBACK_ITEMS } from '../data/newsFallback'
 
 const fallbackPlaceImage = '/images/place-fallback.svg'
 const fallbackFigureImage = '/images/figure-fallback.svg'
@@ -31,32 +33,6 @@ const valueProps = [
 
 const featuredSlugOrder = ['bosworth', 'stonehenge', 'hadrians-wall', 'edinburgh-castle']
 
-const newsItems = [
-  {
-    id: 'n1',
-    title: 'Dispatches from active excavations',
-    dateLabel: '05 Dec 2025',
-    category: 'Field report',
-    summary: 'Weekly correspondents surface context from digs, court records, and museum releases.',
-    link: 'https://places-in-time.com/history-news/',
-  },
-  {
-    id: 'n2',
-    title: 'Policy shifts that reshape heritage',
-    dateLabel: '02 Dec 2025',
-    category: 'Briefing',
-    summary: 'Track how funding rounds, stewardship debates, and access pilots change visiting rights.',
-    link: 'https://places-in-time.com/history-news/',
-  },
-  {
-    id: 'n3',
-    title: 'Voices from local historians',
-    dateLabel: '29 Nov 2025',
-    category: 'Perspective',
-    summary: 'Hear regional researchers explain why certain archives, trails, or rituals matter now.',
-    link: 'https://places-in-time.com/history-news/',
-  },
-]
 
 const chatMessages = [
   { id: 'm1', role: 'user', text: 'What did the ravens really mean to warders at the Tower?' },
@@ -72,6 +48,7 @@ const chatMessages = [
     text: 'Absolutely. I can pair the Crown Jewels rotation with apprentice-friendly stories and river walk timings.',
   },
 ]
+
 
 type HistoricalFigureLike = HistoricalFigure & { primaryEra?: string; imageUrl?: string }
 
@@ -114,6 +91,7 @@ const getFigurePortrait = (figure: HistoricalFigureLike): string | undefined =>
 const Home = () => {
   const [places, setPlaces] = useState<Place[]>([])
   const [figures, setFigures] = useState<HistoricalFigure[]>([])
+  const [newsFeed, setNewsFeed] = useState<ContentItem[]>([])
 
   useEffect(() => {
     let cancelled = false
@@ -138,6 +116,17 @@ const Home = () => {
       })
       .catch(() => {
         // fallback to seed data handled below
+      })
+
+    api
+      .listNews({ limit: 3, status: 'published', sort: 'published_at', order: 'desc' })
+      .then((data) => {
+        if (!cancelled) {
+          setNewsFeed(data)
+        }
+      })
+      .catch(() => {
+        // fallback handled via static items
       })
 
     return () => {
@@ -194,6 +183,8 @@ const Home = () => {
     text: place.echo_text ?? place.echo?.text ?? 'Fresh echo arriving soon.',
     source: place.echo_title ?? place.echo?.title ?? place.name,
   }))
+
+  const newsItems = newsFeed.length > 0 ? newsFeed.slice(0, 3).map((item) => toNewsCardItem(item)) : NEWS_FALLBACK_ITEMS
 
   const totalPlaces = places.length > 0 ? places.length : activePlaces.length
   const totalFigures = figures.length > 0 ? figures.length : activeFigures.length
@@ -332,14 +323,9 @@ const Home = () => {
           ))}
         </div>
         <div className="button-row">
-          <a
-            className="button"
-            href="https://places-in-time.com/history-news/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read history news
-          </a>
+          <Link className="button" to="/news">
+            Browse the newsroom
+          </Link>
         </div>
       </section>
 
