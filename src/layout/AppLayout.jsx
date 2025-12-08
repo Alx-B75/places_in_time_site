@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router-dom'
-import LogoMark from '../components/LogoMark'
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -17,7 +16,15 @@ const AppLayout = ({ children }) => {
       <header className="site-header">
         <div className="content-container header-inner">
           <NavLink to="/" className="brand" aria-label="Places in Time home">
-            <LogoMark tone="currentColor" size={48} className="brand-mark" />
+            <img
+              src="/favicon.svg"
+              width="48"
+              height="48"
+              alt=""
+              aria-hidden="true"
+              className="brand-mark"
+              loading="lazy"
+            />
             <span className="brand-text">
               <span className="brand-line">Places</span>
               <span className="brand-line">in Time</span>
@@ -44,7 +51,15 @@ const AppLayout = ({ children }) => {
       <footer className="site-footer">
         <div className="content-container footer-grid">
           <div className="footer-brand">
-            <LogoMark tone="currentColor" size={56} className="brand-mark" />
+            <img
+              src="/favicon.svg"
+              width="56"
+              height="56"
+              alt=""
+              aria-hidden="true"
+              className="brand-mark"
+              loading="lazy"
+            />
             <div>
               <p className="eyebrow">Places in Time</p>
               <p>

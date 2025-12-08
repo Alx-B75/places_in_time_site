@@ -175,6 +175,9 @@ span {
 .brand-mark {
   flex-shrink: 0;
   color: inherit;
+  display: block;
+  width: 48px;
+  height: 48px;
 }
 
 .brand-text {
@@ -230,6 +233,11 @@ span {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+}
+
+.site-footer .brand-mark {
+  width: 56px;
+  height: 56px;
 }
 
 .site-footer p {
