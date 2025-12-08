@@ -11,6 +11,7 @@ export type NewsCardItem = {
   to?: string
   ctaLabel?: string
   image?: string
+  sourceName?: string
 }
 
 const newsDateFormatter = new Intl.DateTimeFormat('en-GB', {
@@ -73,6 +74,7 @@ export const toNewsCardItem = (item: ContentItem, fallbackRoute = '/news'): News
     to: ctaUrl ? undefined : fallbackRoute,
     ctaLabel,
     image: resolvedImage,
+    sourceName: item.source_name ?? getStringField(item, ['sourceName', 'source']) ?? undefined,
   }
 }
 

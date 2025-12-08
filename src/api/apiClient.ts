@@ -300,9 +300,11 @@ export interface ContentItem {
   body?: string | null
   category?: string | null
   type?: string | null
+  content_type?: string | null
   tags?: string[] | null
   status?: string | null
   featured?: boolean | null
+  is_featured?: boolean | null
   featured_rank?: number | null
   hero_image?: string | null
   heroImage?: string | null
@@ -317,8 +319,11 @@ export interface ContentItem {
   cta_url?: string | null
   external_url?: string | null
   externalUrl?: string | null
+  source_name?: string | null
   attachments?: ContentMediaAsset[] | null
   links?: ContentLink[] | null
+  related_places?: string[] | null
+  related_figures?: string[] | null
   metadata?: Record<string, unknown> | null
   [key: string]: unknown
 }
@@ -327,6 +332,7 @@ export interface ContentListParams {
   skip?: number
   limit?: number
   search?: string
+  contentType?: string
   types?: string[]
   tags?: string[]
   category?: string
@@ -336,6 +342,7 @@ export interface ContentListParams {
   after?: string
   placeSlug?: string
   figureSlug?: string
+  isFeatured?: boolean
   sort?: string
   order?: 'asc' | 'desc'
 }
@@ -528,12 +535,15 @@ export class ApiClient {
     if (params?.era) {
       searchParams.set('era', params.era)
     }
-    const query = searchParams.toString()
-    const path = query ? `/places/?${query}` : '/places/'
-    const data = await this.request<Place[] | { items?: Place[] }>(path, { method: 'GET' })
-    if (Array.isArray(data)) {
-      return data
+    if (params?.contentType) {
+      searchParams.set('content_type', params.contentType)
     }
+    if (params?.types?.length) {
+      params.types.forEach((type) => {
+        if (type) {
+          searchParams.append('content_type', type)
+        }
+      })
     return data.items ?? []
   }
 
@@ -568,6 +578,9 @@ export class ApiClient {
     if (typeof params?.featured === 'boolean') {
       searchParams.set('featured', params.featured ? 'true' : 'false')
     }
+    if (typeof params?.isFeatured === 'boolean') {
+      searchParams.set('is_featured', params.isFeatured ? 'true' : 'false')
+    }
     if (params?.status) {
       searchParams.set('status', params.status)
     }
@@ -595,7 +608,7 @@ export class ApiClient {
   async listContent(params?: ContentListParams): Promise<ContentItem[]> {
     const searchParams = this.buildContentSearchParams(params)
     const query = searchParams.toString()
-    const path = query ? `/content/items?${query}` : '/content/items'
+    const path = query ? `/content?${query}` : '/content'
     const data = await this.request<ContentItem[] | { items?: ContentItem[] }>(path, { method: 'GET' })
     if (Array.isArray(data)) {
       return data
@@ -607,20 +620,30 @@ export class ApiClient {
     const mergedParams: ContentListParams = {
       limit: params?.limit ?? 12,
       status: params?.status ?? 'published',
-      sort: params?.sort ?? 'published_at',
-      order: params?.order ?? 'desc',
+      contentType: params?.contentType ?? 'news_article',
       ...params,
     }
 
-    if (!mergedParams.types || mergedParams.types.length === 0) {
-      mergedParams.types = ['news']
+    if (!mergedParams.contentType && (!mergedParams.types || mergedParams.types.length === 0)) {
+      mergedParams.types = ['news_article']
     }
 
-    return this.listContent(mergedParams)
+    const searchParams = this.buildContentSearchParams(mergedParams)
+    if (!searchParams.has('content_type')) {
+      searchParams.set('content_type', 'news_article')
+    }
+
+    const query = searchParams.toString()
+    const path = query ? `/news?${query}` : '/news'
+    return this.request<ContentItem[]>(path, { method: 'GET' })
   }
 
   getContentItem(slug: string): Promise<ContentItem> {
-    return this.request<ContentItem>(`/content/items/${encodeURIComponent(slug)}`, { method: 'GET' })
+    return this.request<ContentItem>(`/content/${encodeURIComponent(slug)}`, { method: 'GET' })
+  }
+
+  getNewsItem(slug: string): Promise<ContentItem> {
+    return this.request<ContentItem>(`/news/${encodeURIComponent(slug)}`, { method: 'GET' })
   }
 
   ask(payload: AskRequest, token?: string): Promise<AskResponse> {
