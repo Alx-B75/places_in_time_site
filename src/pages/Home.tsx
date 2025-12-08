@@ -291,14 +291,9 @@ const Home = () => {
             The shop curates limited prints, notebooks, and tactile tools that echo the palette and typography of the atlas.
             Every order helps underwrite new oral histories, photo essays, and archival clearances so the map keeps expanding.
           </p>
-          <a
-            className="button primary"
-            href="https://places-in-time.com/shop/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link className="button primary" to="/shop">
             Visit the shop
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -373,14 +368,9 @@ const Home = () => {
             It also introduces the team curating the atlas—designers, historians, and technologists who believe cultural heritage
             should be generous, citation-rich, and accessible.
           </p>
-          <a
-            className="button"
-            href="https://places-in-time.com/about/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link className="button" to="/about">
             Read more
-          </a>
+          </Link>
         </div>
         <div className="home-about-media">
           <img src="/images/home/about-hero.jpg" alt="Curators collaborating inside the Places in Time studio" loading="lazy" />

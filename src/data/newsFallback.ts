@@ -7,7 +7,7 @@ export const NEWS_FALLBACK_ITEMS: NewsCardItem[] = [
     dateLabel: '05 Dec 2025',
     category: 'Field report',
     summary: 'Weekly correspondents surface context from digs, court records, and museum releases.',
-    link: 'https://places-in-time.com/history-news/',
+    to: '/news',
   },
   {
     id: 'n2',
@@ -15,7 +15,7 @@ export const NEWS_FALLBACK_ITEMS: NewsCardItem[] = [
     dateLabel: '02 Dec 2025',
     category: 'Briefing',
     summary: 'Track how funding rounds, stewardship debates, and access pilots change visiting rights.',
-    link: 'https://places-in-time.com/history-news/',
+    to: '/news',
   },
   {
     id: 'n3',
@@ -23,6 +23,6 @@ export const NEWS_FALLBACK_ITEMS: NewsCardItem[] = [
     dateLabel: '29 Nov 2025',
     category: 'Perspective',
     summary: 'Hear regional researchers explain why certain archives, trails, or rituals matter now.',
-    link: 'https://places-in-time.com/history-news/',
+    to: '/news',
   },
 ]

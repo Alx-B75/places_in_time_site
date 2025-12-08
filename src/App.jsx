@@ -8,6 +8,10 @@ import Person from './pages/Person.tsx'
 import Chat from './pages/Chat.jsx'
 import Shop from './pages/Shop.jsx'
 import News from './pages/News.tsx'
+import About from './pages/About.tsx'
+import PrivacyPolicy from './pages/PrivacyPolicy.tsx'
+import TermsOfUse from './pages/TermsOfUse.tsx'
+import Impressum from './pages/Impressum.tsx'
 
 const App = () => {
   return (
@@ -21,6 +25,10 @@ const App = () => {
         <Route path="/chat" element={<Chat />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/news" element={<News />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/privacy-policy-gdpr" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-use" element={<TermsOfUse />} />
+        <Route path="/impressum" element={<Impressum />} />
       </Routes>
     </AppLayout>
   )
