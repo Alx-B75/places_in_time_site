@@ -4,7 +4,7 @@
   "description": "A design system for historical storytelling across Britain’s places and figures.",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/favicon.svg?v=2",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
