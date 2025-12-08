@@ -184,10 +184,12 @@ span {
   display: flex;
   flex-direction: column;
   line-height: 1.1;
+  color: inherit;
 }
 
 .brand-line {
   font-weight: 600;
+  color: inherit;
 }
 
 .site-nav {
@@ -244,7 +246,12 @@ span {
 
 .site-footer p {
   margin: 0.25rem 0;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.site-footer small,
+.site-footer .eyebrow {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .site-footer a {
