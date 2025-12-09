@@ -9,7 +9,7 @@ const Shop = () => {
 Each piece is part of our journey through the past, with new designs added regularly. If there’s a place, figure, or moment you’d love to see brought to life, let us know. You are welcome to send us a message. We’re always open to ideas from fellow time travelers.
           {/* TODO: swap copy when merch catalog is ready */}
         </p>
-        <p>Check back after launch week or join the mailing list for early access.</p>
+       
         <a className="button primary" href="https://www.redbubble.com/people/alex-bunting/shop" target="_blank" rel="noreferrer">
           Shop Threads
         </a>
