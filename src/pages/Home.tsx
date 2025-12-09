@@ -12,6 +12,7 @@ import { toNewsCardItem, type NewsCardItem } from '../utils/content'
 import { PLACES } from '../data/places'
 import { FIGURES } from '../data/figures'
 import { NEWS_FALLBACK_ITEMS } from '../data/newsFallback'
+import { useHomepageContent } from '../hooks/useHomepageContent'
 
 const fallbackPlaceImage = '/images/place-fallback.svg'
 const fallbackFigureImage = '/images/figure-fallback.svg'
@@ -96,10 +97,23 @@ const getFigureSummary = (figure: HistoricalFigureLike): string =>
 const getFigurePortrait = (figure: HistoricalFigureLike): string | undefined =>
   figure.image_url ?? figure.imageUrl
 
+const renderMultiline = (text: string) => {
+  const segments = text.split('\n')
+  return segments.map((segment, index) => (
+    <span key={`line-${index}`}>
+      {segment}
+      {index < segments.length - 1 && <br />}
+    </span>
+  ))
+}
+
 const Home = () => {
+  const content = useHomepageContent()
   const [places, setPlaces] = useState<Place[]>([])
   const [figures, setFigures] = useState<HistoricalFigure[]>([])
   const [newsFeed, setNewsFeed] = useState<ContentItem[]>([])
+
+  const quothaParagraphs = content.quothaBody.split('\n\n')
 
   useEffect(() => {
     let cancelled = false
@@ -199,16 +213,14 @@ const Home = () => {
         <div className="home-hero-grid">
           <div className="home-hero-copy">
             <p className="eyebrow">Places in Time</p>
-            <h1>Explore historic Britain — and speak with the voices who shaped it.</h1>
-            <p className="lead">
-              From ancient stones to royal towers, explore iconic places — and speak with the people whose decisions, victories, and failures still echo today.
-            </p>
+            <h1>{content.heroTitle}</h1>
+            <p className="lead">{content.heroSubtitle}</p>
             <div className="button-row">
               <Link className="button primary" to="/places">
-                Start Exploring
+                {content.heroCtaPrimaryLabel}
               </Link>
               <Link className="button" to="/chat">
-                Talk to History
+                {content.heroCtaSecondaryLabel}
               </Link>
             </div>
           </div>
@@ -242,10 +254,8 @@ const Home = () => {
       <section>
         <div className="section-header">
           <p className="eyebrow">Featured Places</p>
-          <h2>Discover the places that made history</h2>
-          <p>
-            Journey to castles, battlefields, monasteries, and cities that shaped Britain. Each location includes fast facts, engaging stories, and “Echoes from the Past” — short glimpses into moments that changed everything.
-          </p>
+          <h2>{content.placesTitle}</h2>
+          <p>{renderMultiline(content.placesBody)}</p>
         </div>
         <div className="featured-places-carousel">
           {featuredPlaces.map((place) => (
@@ -262,10 +272,8 @@ const Home = () => {
       <section>
         <div className="section-header">
           <p className="eyebrow">Meet the Figures</p>
-          <h2>History is made by people — now meet them</h2>
-          <p>
-            Behind every landmark is a life lived boldly. Explore rulers, rebels, warriors, writers, kings, queens, monks, engineers, and visionaries — all brought to life through clear, accessible storytelling.
-          </p>
+          <h2>{content.peopleTitle}</h2>
+          <p>{renderMultiline(content.peopleBody)}</p>
         </div>
         <div className="figure-grid">
           {figurePreviews.map((figure) => (
@@ -282,10 +290,8 @@ const Home = () => {
       <section className="home-history-news">
         <div className="section-header">
           <p className="eyebrow">History news & context</p>
-          <h2>History in the headlines</h2>
-          <p>
-            Discover fresh stories, new discoveries, anniversaries, and surprising connections between today’s world and Britain’s past.
-          </p>
+          <h2>{content.newsTitle}</h2>
+          <p>{renderMultiline(content.newsBody)}</p>
         </div>
         <div className="home-history-media">
           <img
@@ -301,7 +307,7 @@ const Home = () => {
         </div>
         <div className="button-row">
           <Link className="button" to="/news">
-            See Latest News
+            {content.newsCtaLabel}
           </Link>
         </div>
       </section>
@@ -309,14 +315,13 @@ const Home = () => {
       <section className="chat-spotlight">
         <div>
           <p className="eyebrow">Talk to History</p>
-          <h2>Talk to History — with Quotha, the Scholarly Raven</h2>
-          <p>
-            Ask questions, explore turning points, and dive deeper into the past. Quotha guides your conversations with the voices of historical figures, drawing on curated sources and expert-checked context.
-          </p>
-          <p>A thoughtful, intelligent way to explore the past — one question at a time.</p>
+          <h2>{content.quothaTitle}</h2>
+          {quothaParagraphs.map((paragraph, index) => (
+            <p key={`quotha-paragraph-${index}`}>{renderMultiline(paragraph)}</p>
+          ))}
           <div className="button-row">
             <Link className="button primary" to="/chat">
-              Ask Quotha
+              {content.quothaCtaLabel}
             </Link>
           </div>
         </div>
@@ -345,12 +350,10 @@ const Home = () => {
         </div>
         <div className="home-shop-copy">
           <p className="eyebrow">Places in Time Shop</p>
-          <h2>Shop the Collection</h2>
-          <p>
-            Original artwork, historically grounded designs, and PiT-exclusive merchandise — created to celebrate the places and people that shaped our history.
-          </p>
+          <h2>{content.shopTitle}</h2>
+          <p>{renderMultiline(content.shopBody)}</p>
           <Link className="button primary" to="/shop">
-            Shop Now
+            {content.shopCtaLabel}
           </Link>
         </div>
       </section>

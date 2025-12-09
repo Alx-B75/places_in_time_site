@@ -11,6 +11,7 @@
     "export:places": "node scripts/export_places_json.mjs"
   },
   "dependencies": {
+    "@sanity/client": "^7.13.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6"
