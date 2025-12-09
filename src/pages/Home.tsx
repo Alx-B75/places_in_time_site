@@ -201,7 +201,7 @@ const Home = () => {
             <p className="eyebrow">Places in Time</p>
             <h1>Explore historic Britain — and speak with the voices who shaped it.</h1>
             <p className="lead">
-              From ancient stones to royal towers, explore iconic places — and meet the people whose decisions, victories, and failures still echo today.
+              From ancient stones to royal towers, explore iconic places — and speak with the people whose decisions, victories, and failures still echo today.
             </p>
             <div className="button-row">
               <Link className="button primary" to="/places">
@@ -244,7 +244,7 @@ const Home = () => {
           <p className="eyebrow">Featured Places</p>
           <h2>Discover the places that made history</h2>
           <p>
-            Journey through castles, battlefields, monasteries, and cities that shaped Britain. Each location includes fast facts, engaging stories, and “Echoes from the Past” — short glimpses into moments that changed everything.
+            Journey to castles, battlefields, monasteries, and cities that shaped Britain. Each location includes fast facts, engaging stories, and “Echoes from the Past” — short glimpses into moments that changed everything.
           </p>
         </div>
         <div className="featured-places-carousel">

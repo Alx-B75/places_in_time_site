@@ -3,14 +3,15 @@ const Shop = () => {
     <div className="shop-page" role="region" aria-label="Shop teaser">
       <div className="shop-card">
         <p className="eyebrow">Merch drop</p>
-        <h1>Shop coming soon</h1>
+        <h1>Threads In Time</h1>
         <p>
-          We are curating prints, field notebooks, and tactile maps that mirror the Places in Time palette.
+          Welcome to Threads in Time — a growing collection of historically inspired designs from Places in Time.
+Each piece is part of our journey through the past, with new designs added regularly. If there’s a place, figure, or moment you’d love to see brought to life, let us know. You are welcome to send us a message. We’re always open to ideas from fellow time travelers.
           {/* TODO: swap copy when merch catalog is ready */}
         </p>
         <p>Check back after launch week or join the mailing list for early access.</p>
         <a className="button primary" href="https://www.redbubble.com/people/alex-bunting/shop" target="_blank" rel="noreferrer">
-          Visit the Redbubble shop
+          Shop Threads
         </a>
       </div>
     </div>
