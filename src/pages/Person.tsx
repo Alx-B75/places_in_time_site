@@ -14,6 +14,51 @@ type FigureLike = HistoricalFigure & {
   teaser?: string
   imageUrl?: string
   mainSite?: string
+  related_places?: string[] | string | null
+  relatedPlaces?: string[] | string | null
+}
+
+const parseRelatedPlaces = (value?: string[] | string | null): string[] => {
+  if (!value) {
+    return []
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
+      .filter((entry): entry is string => Boolean(entry))
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) {
+      return []
+    }
+
+    if (trimmed.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(trimmed)
+        if (Array.isArray(parsed)) {
+          return parsed
+            .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
+            .filter((entry): entry is string => Boolean(entry))
+        }
+      } catch {
+        // fall through to comma/standalone handling
+      }
+    }
+
+    if (trimmed.includes(',')) {
+      return trimmed
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0)
+    }
+
+    return [trimmed]
+  }
+
+  return []
 }
 
 const buildEra = (figure: FigureLike): string =>
@@ -164,6 +209,12 @@ const Person = () => {
   const lifespan = formatLifespan(figure.birth_year, figure.death_year)
   const rolesLine = formatRoles(figure.roles)
   const longBio = figure.long_bio ?? null
+  const relatedPlaces = parseRelatedPlaces(figure.related_places ?? figure.relatedPlaces ?? null)
+  const associatedPlaces = relatedPlaces.length > 0
+    ? Array.from(new Set(relatedPlaces))
+    : mainSite
+      ? [mainSite]
+      : []
   const longBioParagraphs = longBio
     ? longBio
         .split(/\n{2,}/)
@@ -188,7 +239,7 @@ const Person = () => {
 
       {error && !notFound && <p className="error-state">{error}</p>}
 
-      {(quote || mainSite || lifespan || rolesLine) && (
+      {(quote || associatedPlaces.length > 0 || lifespan || rolesLine) && (
         <section className="at-a-glance">
           <h2>At a glance</h2>
           {quote && (
@@ -197,9 +248,9 @@ const Person = () => {
             </blockquote>
           )}
           <ul className="figure-fact-list">
-            {mainSite && (
+            {associatedPlaces.length > 0 && (
               <li>
-                <strong>Most associated with:</strong> {mainSite}
+                <strong>Most associated with:</strong> {associatedPlaces.join(', ')}
               </li>
             )}
             {lifespan && (
