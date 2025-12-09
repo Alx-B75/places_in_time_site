@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import FeaturedPlacesCard from '../components/FeaturedPlacesCard'
 import FigureCard from '../components/FigureCard'
 import EchoSnippet from '../components/EchoSnippet'
@@ -112,12 +112,25 @@ const buildButtonClass = (variant?: string) => ['button', variant === 'secondary
 const isInternalLink = (href: string) => href.startsWith('/')
 
 const Home = () => {
+  const location = useLocation()
   const content = useHomepageContent()
   const [places, setPlaces] = useState<Place[]>([])
   const [figures, setFigures] = useState<HistoricalFigure[]>([])
   const [newsFeed, setNewsFeed] = useState<ContentItem[]>([])
   const heroVisual = content.heroVisual
+  const heroImage = content.heroImage
   const closingCta = content.closingCta
+  const heroImageSrc = heroImage?.asset?.url ?? '/images/home/homepagebanner.png'
+  const heroImageAlt = heroImage?.alt ?? 'Places in Time collage showcasing the atlas design system'
+  const searchParams = new URLSearchParams(location.search)
+  const isPreview = searchParams.get('preview') === '1'
+
+  useEffect(() => {
+    if (isPreview) {
+      // eslint-disable-next-line no-console
+      console.log('Preview mode (published content only)')
+    }
+  }, [isPreview])
 
   useEffect(() => {
     let cancelled = false
@@ -232,8 +245,8 @@ const Home = () => {
           </div>
           <figure className="home-hero-visual">
             <img
-              src="/images/home/homepagebanner.png"
-              alt="Places in Time collage showcasing the atlas design system"
+              src={heroImageSrc}
+              alt={heroImageAlt}
               loading="eager"
             />
             <figcaption className="home-hero-visual-meta">
@@ -381,6 +394,11 @@ const Home = () => {
           })}
         </div>
       </section>
+      {isPreview && (
+        <div className="preview-pill" aria-live="polite">
+          Preview mode — published content
+        </div>
+      )}
     </>
   )
 }

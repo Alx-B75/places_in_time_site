@@ -398,6 +398,21 @@ span {
   color: var(--pit-offwhite);
 }
 
+.preview-pill {
+  position: fixed;
+  left: var(--pit-space-2);
+  bottom: var(--pit-space-2);
+  padding: 0.5rem 1rem;
+  border-radius: var(--pit-radius-pill);
+  background: color-mix(in srgb, var(--pit-bg-dark) 85%, transparent);
+  color: var(--pit-offwhite);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 25px color-mix(in srgb, var(--pit-slate) 35%, transparent);
+  z-index: 999;
+}
+
 .button:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 24px color-mix(in srgb, var(--pit-slate) 18%, transparent);

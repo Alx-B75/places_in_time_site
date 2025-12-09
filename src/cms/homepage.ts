@@ -7,6 +7,16 @@ export interface HeroVisualContent {
   footnote: string
 }
 
+export interface HeroImageAsset {
+  _id: string
+  url: string
+}
+
+export interface HeroImageContent {
+  asset?: HeroImageAsset
+  alt?: string
+}
+
 export interface ClosingCtaButton {
   label: string
   href: string
@@ -26,6 +36,7 @@ export interface HomepageContent {
   heroCtaPrimaryLabel: string
   heroCtaSecondaryLabel: string
   heroVisual: HeroVisualContent
+  heroImage?: HeroImageContent
   placesTitle: string
   placesBody: string
   peopleTitle: string
@@ -53,6 +64,9 @@ export const fallbackHomepageContent: HomepageContent = {
     quote: '“Maps remember more than borders—they remember intent.”',
     body: 'Gradient overlays, tracing strokes, and caption rails keep photography, reconstructions, and satellite data within the brand grid.',
     footnote: 'Visual guidelines travel with every market rollout.',
+  },
+  heroImage: {
+    alt: 'Places in Time collage showcasing the atlas design system',
   },
   placesTitle: 'Discover the places that made history',
   placesBody:
@@ -100,6 +114,13 @@ export async function fetchHomepageContent(): Promise<HomepageContent> {
       body,
       footnote
     },
+    heroImage {
+      asset->{
+        _id,
+        url
+      },
+      alt
+    },
     placesTitle,
     placesBody,
     peopleTitle,
@@ -137,6 +158,13 @@ export async function fetchHomepageContent(): Promise<HomepageContent> {
       ...(data.heroVisual ?? {}),
     }
 
+    const heroImage: HeroImageContent | undefined = data.heroImage
+      ? {
+          ...fallbackHomepageContent.heroImage,
+          ...data.heroImage,
+        }
+      : fallbackHomepageContent.heroImage
+
     const resolvedButtons = data.closingCta?.buttons?.filter((button): button is ClosingCtaButton => {
       return Boolean(button && button.label && button.href)
     }) ?? []
@@ -151,6 +179,7 @@ export async function fetchHomepageContent(): Promise<HomepageContent> {
       ...fallbackHomepageContent,
       ...data,
       heroVisual,
+      heroImage,
       closingCta,
     }
   } catch {
