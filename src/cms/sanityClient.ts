@@ -22,3 +22,9 @@ export function getSanityClient(): SanityClient | null {
 
   return client
 }
+
+console.log("Sanity env check", {
+  projectId: import.meta.env.VITE_SANITY_PROJECT_ID,
+  dataset: import.meta.env.VITE_SANITY_DATASET,
+});
+

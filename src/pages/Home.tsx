@@ -17,21 +17,6 @@ import { useHomepageContent } from '../hooks/useHomepageContent'
 const fallbackPlaceImage = '/images/place-fallback.svg'
 const fallbackFigureImage = '/images/figure-fallback.svg'
 
-const valueProps = [
-  {
-    title: 'Era-aware storytelling',
-    description: 'Guided narratives follow political, cultural, and personal arcs so each site feels alive.',
-  },
-  {
-    title: 'People & places intertwined',
-    description: 'Trace monarchs, rebels, scientists, and builders directly against the ground they shaped.',
-  },
-  {
-    title: 'Conversational research',
-    description: 'Talk to an archivist-trained chatbot that cites sources and keeps the lore grounded.',
-  },
-]
-
 const featuredSlugOrder = ['bosworth', 'stonehenge', 'hadrians-wall', 'edinburgh-castle']
 
 
@@ -97,8 +82,9 @@ const getFigureSummary = (figure: HistoricalFigureLike): string =>
 const getFigurePortrait = (figure: HistoricalFigureLike): string | undefined =>
   figure.image_url ?? figure.imageUrl
 
-const renderMultiline = (text: string) => {
-  const segments = text.split('\n')
+const renderMultiline = (text?: string | null) => {
+  const safeText = text ?? ''
+  const segments = safeText.split('\n')
   return segments.map((segment, index) => (
     <span key={`line-${index}`}>
       {segment}
@@ -107,13 +93,31 @@ const renderMultiline = (text: string) => {
   ))
 }
 
+const renderRichText = (text?: string | null, keyPrefix = 'rich-text') => {
+  if (!text || !text.trim()) {
+    return null
+  }
+
+  return text
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter((paragraph) => paragraph.length > 0)
+    .map((paragraph, index) => (
+      <p key={`${keyPrefix}-${index}`}>{renderMultiline(paragraph)}</p>
+    ))
+}
+
+const buildButtonClass = (variant?: string) => ['button', variant === 'secondary' ? null : 'primary'].filter(Boolean).join(' ')
+
+const isInternalLink = (href: string) => href.startsWith('/')
+
 const Home = () => {
   const content = useHomepageContent()
   const [places, setPlaces] = useState<Place[]>([])
   const [figures, setFigures] = useState<HistoricalFigure[]>([])
   const [newsFeed, setNewsFeed] = useState<ContentItem[]>([])
-
-  const quothaParagraphs = content.quothaBody.split('\n\n')
+  const heroVisual = content.heroVisual
+  const closingCta = content.closingCta
 
   useEffect(() => {
     let cancelled = false
@@ -205,7 +209,9 @@ const Home = () => {
     source: place.echo_title ?? place.echo?.title ?? place.name,
   }))
 
-  const newsItems = newsFeed.length > 0 ? newsFeed.slice(0, 3).map((item) => toNewsCardItem(item)) : NEWS_FALLBACK_ITEMS
+  const newsItems: NewsCardItem[] = newsFeed.length > 0
+    ? newsFeed.slice(0, 3).map((item) => toNewsCardItem(item))
+    : NEWS_FALLBACK_ITEMS
 
   return (
     <>
@@ -231,24 +237,13 @@ const Home = () => {
               loading="eager"
             />
             <figcaption className="home-hero-visual-meta">
-              <span className="era-chip renaissance">Echo Archive</span>
-              <blockquote>“Maps remember more than borders—they remember intent.”</blockquote>
-              <p>
-                Gradient overlays, tracing strokes, and caption rails keep photography, reconstructions, and satellite data within the brand grid.
-              </p>
-              <small>Visual guidelines travel with every market rollout.</small>
+              <span className="era-chip renaissance">{heroVisual.kicker || 'Echo Archive'}</span>
+              {heroVisual.quote && <blockquote>{heroVisual.quote}</blockquote>}
+              {renderRichText(heroVisual.body, 'hero-visual-body')}
+              {heroVisual.footnote && <small>{heroVisual.footnote}</small>}
             </figcaption>
           </figure>
         </div>
-      </section>
-
-      <section className="value-prop">
-        {valueProps.map((prop) => (
-          <article key={prop.title} className="value-card">
-            <h3>{prop.title}</h3>
-            <p>{prop.description}</p>
-          </article>
-        ))}
       </section>
 
       <section>
@@ -293,13 +288,6 @@ const Home = () => {
           <h2>{content.newsTitle}</h2>
           <p>{renderMultiline(content.newsBody)}</p>
         </div>
-        <div className="home-history-media">
-          <img
-            src="/images/home/history-news-hero.jpg"
-            alt="Collage of clippings from the History News feed"
-            loading="lazy"
-          />
-        </div>
         <div className="news-grid">
           {newsItems.map((item) => (
             <NewsCard key={item.id} item={item} />
@@ -316,9 +304,7 @@ const Home = () => {
         <div>
           <p className="eyebrow">Talk to History</p>
           <h2>{content.quothaTitle}</h2>
-          {quothaParagraphs.map((paragraph, index) => (
-            <p key={`quotha-paragraph-${index}`}>{renderMultiline(paragraph)}</p>
-          ))}
+          {renderRichText(content.quothaBody, 'quotha')}
           <div className="button-row">
             <Link className="button primary" to="/chat">
               {content.quothaCtaLabel}
@@ -376,19 +362,23 @@ const Home = () => {
       </section>
 
       <section className="closing-cta">
-        <p className="eyebrow">Ready to explore</p>
-        <h2>Plan a visit, brief the chatbot, or share the atlas.</h2>
-        <p>
-          Follow a thread from a featured place to its people, then hand the conversation to Talk to History for deeper itineraries and citations.
-          Every route keeps the design system intact so the story feels coherent on any device.
-        </p>
+        <p className="eyebrow">{closingCta.eyebrow}</p>
+        <h2>{closingCta.headline}</h2>
+        {renderRichText(closingCta.body, 'closing-cta')}
         <div className="button-row" style={{ justifyContent: 'center' }}>
-          <Link className="button primary" to="/places">
-            Browse the atlas
-          </Link>
-          <Link className="button" to="/people">
-            Assign figures
-          </Link>
+          {closingCta.buttons.map((button) => {
+            const key = `${button.label}-${button.href}`
+            const className = buildButtonClass(button.variant)
+            return isInternalLink(button.href) ? (
+              <Link key={key} className={className} to={button.href}>
+                {button.label}
+              </Link>
+            ) : (
+              <a key={key} className={className} href={button.href} target="_blank" rel="noreferrer">
+                {button.label}
+              </a>
+            )
+          })}
         </div>
       </section>
     </>
