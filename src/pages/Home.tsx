@@ -33,21 +33,6 @@ const valueProps = [
 
 const featuredSlugOrder = ['bosworth', 'stonehenge', 'hadrians-wall', 'edinburgh-castle']
 
-const shopProducts = [
-  {
-    id: 'shield-wall-print',
-    title: 'Saxon Shield Wall Print',
-    image: 'https://ih1.redbubble.net/image.5749775065.5694/raf,360x360,075,t,fafafa:ca443f4786.u4.jpg',
-    link: 'https://www.redbubble.com/i/photographic-print/Saxon-shield-wall-print-by-Alex-Bunting/167965694.6Q0TX',
-  },
-  {
-    id: 'lindisfarne-sticker',
-    title: 'Lindisfarne 793 Sticker',
-    image: 'https://ih1.redbubble.net/image.5865031963.3430/raf,360x360,075,t,fafafa:ca443f4786.u2.jpg',
-    link: 'https://www.redbubble.com/i/sticker/Lindisfarne-793-Row-Hard-Raid-Harder-Viking-Humour-T-Shirt-by-Alex-Bunting/171693430.EJUG5',
-  },
-]
-
 
 const chatMessages = [
   { id: 'm1', role: 'user', text: 'What did the ravens really mean to warders at the Tower?' },
@@ -214,20 +199,16 @@ const Home = () => {
         <div className="home-hero-grid">
           <div className="home-hero-copy">
             <p className="eyebrow">Places in Time</p>
-            <h1>Britain’s landscape, retold with living voices.</h1>
+            <h1>Explore historic Britain — and speak with the voices who shaped it.</h1>
             <p className="lead">
-              Navigate castles, islands, markets, and moors through layered stories that weave place, people, and purpose.
-              The system keeps every era legible—from Neolithic engineering to industrial skylines.
+              From ancient stones to royal towers, explore iconic places — and meet the people whose decisions, victories, and failures still echo today.
             </p>
             <div className="button-row">
               <Link className="button primary" to="/places">
-                Explore the atlas
-              </Link>
-              <Link className="button" to="/people">
-                Meet the figures
+                Start Exploring
               </Link>
               <Link className="button" to="/chat">
-                Talk to the archives
+                Talk to History
               </Link>
             </div>
           </div>
@@ -261,9 +242,9 @@ const Home = () => {
       <section>
         <div className="section-header">
           <p className="eyebrow">Featured Places</p>
-          <h2>Anchor the journey with hero sites</h2>
+          <h2>Discover the places that made history</h2>
           <p>
-            Each card carries an era chip, overlay gradient, and quick readouts for summaries, logistics, or interactive layers.
+            Journey through castles, battlefields, monasteries, and cities that shaped Britain. Each location includes fast facts, engaging stories, and “Echoes from the Past” — short glimpses into moments that changed everything.
           </p>
         </div>
         <div className="featured-places-carousel">
@@ -271,54 +252,39 @@ const Home = () => {
             <FeaturedPlacesCard key={place.slug} place={place} />
           ))}
         </div>
+        <div className="button-row">
+          <Link className="button" to="/places">
+            View All Places
+          </Link>
+        </div>
       </section>
 
       <section>
         <div className="section-header">
           <p className="eyebrow">Meet the Figures</p>
-          <h2>People who bend the map</h2>
+          <h2>History is made by people — now meet them</h2>
+          <p>
+            Behind every landmark is a life lived boldly. Explore rulers, rebels, warriors, writers, kings, queens, monks, engineers, and visionaries — all brought to life through clear, accessible storytelling.
+          </p>
         </div>
         <div className="figure-grid">
           {figurePreviews.map((figure) => (
             <FigureCard key={figure.name} figure={figure} />
           ))}
         </div>
-      </section>
-
-      <section className="home-shop">
-        <div className="home-shop-copy">
-          <p className="eyebrow">Threads in Time</p>
-          <h2>Wear the stories we map</h2>
-          <p>Welcome to Threads in Time — a growing collection of historically inspired designs from Places in Time.</p>
-          <p>Each piece is part of our journey through the past, with new designs added regularly.</p>
-          <p>
-            If there’s a place, figure, or moment you’d love to see brought to life, let us know. You are welcome to send us a message. We’re always open to ideas from
-            fellow time travelers.
-          </p>
-        </div>
-        <div className="home-shop-products">
-          {shopProducts.map((product) => (
-            <article key={product.id} className="shop-product-card">
-              {product.image && (
-                <div className="shop-product-media">
-                  <img src={product.image} alt={`${product.title} preview`} loading="lazy" />
-                </div>
-              )}
-              <h3>{product.title}</h3>
-              <a className="button" href={product.link} target="_blank" rel="noreferrer">
-                View on Redbubble
-              </a>
-            </article>
-          ))}
+        <div className="button-row">
+          <Link className="button" to="/people">
+            Explore Historical Figures
+          </Link>
         </div>
       </section>
 
       <section className="home-history-news">
         <div className="section-header">
           <p className="eyebrow">History news & context</p>
-          <h2>Read the dispatches shaping today’s visits</h2>
+          <h2>History in the headlines</h2>
           <p>
-            Our editorial desk monitors excavations, policy moves, and community storytelling. These quick briefs point to the full feed so you can dive deeper.
+            Discover fresh stories, new discoveries, anniversaries, and surprising connections between today’s world and Britain’s past.
           </p>
         </div>
         <div className="home-history-media">
@@ -335,24 +301,22 @@ const Home = () => {
         </div>
         <div className="button-row">
           <Link className="button" to="/news">
-            Browse the newsroom
+            See Latest News
           </Link>
         </div>
       </section>
 
       <section className="chat-spotlight">
         <div>
-          <p className="eyebrow">Conversation Spotlight</p>
-          <h2>Chat with the keeper of echoes</h2>
+          <p className="eyebrow">Talk to History</p>
+          <h2>Talk to History — with Quotha, the Scholarly Raven</h2>
           <p>
-            The chatbot UI uses stroke arcs and layered panels to keep sources, suggestions, and safety cues visible. This mock conversation shows how prompts, responses, and itinerary boosts sit together.
+            Ask questions, explore turning points, and dive deeper into the past. Quotha guides your conversations with the voices of historical figures, drawing on curated sources and expert-checked context.
           </p>
+          <p>A thoughtful, intelligent way to explore the past — one question at a time.</p>
           <div className="button-row">
             <Link className="button primary" to="/chat">
-              Launch the chat beta
-            </Link>
-            <Link className="button" to="/places">
-              Attach to a place
+              Ask Quotha
             </Link>
           </div>
         </div>
@@ -371,32 +335,30 @@ const Home = () => {
         </div>
       </section>
 
+      <section className="home-shop">
+        <div className="home-shop-media">
+          <img
+            src="/images/home/shop-hero.jpg"
+            alt="Selection of Places in Time merchandise"
+            loading="lazy"
+          />
+        </div>
+        <div className="home-shop-copy">
+          <p className="eyebrow">Places in Time Shop</p>
+          <h2>Shop the Collection</h2>
+          <p>
+            Original artwork, historically grounded designs, and PiT-exclusive merchandise — created to celebrate the places and people that shaped our history.
+          </p>
+          <Link className="button primary" to="/shop">
+            Shop Now
+          </Link>
+        </div>
+      </section>
+
       <section className="home-about">
         <div className="home-about-copy">
           <p className="eyebrow">About Places in Time</p>
           <h2>Our story</h2>
-          <p>
-            At Places in Time, history isn’t just something you read — it’s something you feel. Our journey began with a simple belief:
-            the past isn’t dead, it leaves echoes in the places it happened. From windswept battlefields to silent standing stones,
-            those echoes are all around us — waiting to be heard, felt, and understood.
-          </p>
-          <p>
-            We believe that to truly understand the people of the past — their choices, triumphs, and tragedies — you need to walk where they walked.
-            To stand where they stood. It’s only when your feet touch the same ground that you begin to grasp the weight of their decisions
-            and the world they lived in.
-          </p>
-          <p>
-            Places in Time was founded by a lifelong explorer of stories, myths, and real events. Frustrated by how often history feels distant and abstract,
-            we set out to reconnect people — especially the next generation — with the landscapes that shaped our world.
-          </p>
-          <p>
-            We began with some of the UK’s most iconic historical locations. Rather than just presenting facts, we pair each place with the figures who made it matter:
-            Roman commanders, Saxon queens, rebel plotters, druid priests, and more. You’ll meet them, hear their stories, and even talk to them through
-            our interactive Voices from the Past.
-          </p>
-          <p>
-            Our mission is simple: to make history real. To tell forgotten tales. To invite you into the world that once was — and to help you see the past with new eyes.
-          </p>
           <p>
             This is just the beginning. Whether you’re a student, a teacher, a curious explorer, or a time-traveling dreamer, Places in Time is here to bring history to life — one place,
             one story, one voice at a time.
