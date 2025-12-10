@@ -20,6 +20,8 @@ export interface ChatState {
   maxQuestions?: number | null
   remainingQuestions?: number | null
   expiresAt?: string | null
+  limitReached: boolean
+  serviceError?: 'quota' | null
   threads: ThreadSummary[]
   currentThreadId?: number | string | null
   messages: ChatMessage[]
@@ -37,6 +39,8 @@ const initialState: ChatState = {
   maxQuestions: null,
   remainingQuestions: null,
   expiresAt: null,
+  limitReached: false,
+  serviceError: null,
   threads: [],
   currentThreadId: null,
   messages: [],
@@ -67,6 +71,7 @@ type ChatAction =
   | { type: 'SET_CURRENT_THREAD'; payload: number | string | null }
   | { type: 'ADD_MESSAGE'; payload: ChatMessage }
   | { type: 'UPDATE_GUEST_LIMITS'; payload: { maxQuestions?: number | null; remainingQuestions?: number | null } }
+  | { type: 'SET_LIMIT_STATUS'; payload: { limitReached?: boolean; serviceError?: 'quota' | null } }
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
@@ -84,6 +89,8 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         error: null,
         activeFigureSlug: action.payload.figureSlug,
         activePlaceSlug: action.payload.placeSlug,
+        limitReached: false,
+        serviceError: null,
       }
     case 'GUEST_SESSION_READY':
       return {
@@ -96,10 +103,11 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         currentThreadId: action.payload.threadId ?? null,
         activeFigureSlug: action.payload.figureSlug ?? state.activeFigureSlug,
         activePlaceSlug: action.payload.placeSlug ?? state.activePlaceSlug,
-        maxQuestions: action.payload.maxQuestions ?? null,
-        remainingQuestions:
-          action.payload.remainingQuestions ?? action.payload.maxQuestions ?? null,
+        maxQuestions: null,
+        remainingQuestions: null,
         expiresAt: action.payload.expiresAt ?? null,
+        limitReached: false,
+        serviceError: null,
         messages: [],
       }
     case 'GUEST_ERROR':
@@ -113,6 +121,8 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         currentThreadId: null,
         remainingQuestions: null,
         maxQuestions: null,
+        limitReached: false,
+        serviceError: null,
       }
     case 'LOGIN_SUCCESS':
       return {
@@ -123,6 +133,8 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         sessionStarted: false,
         remainingQuestions: null,
         maxQuestions: null,
+        limitReached: false,
+        serviceError: null,
         error: null,
       }
     case 'LOGOUT':
@@ -136,9 +148,24 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case 'UPDATE_GUEST_LIMITS':
       return {
         ...state,
-        maxQuestions: action.payload.maxQuestions ?? state.maxQuestions ?? null,
+        maxQuestions:
+          Object.prototype.hasOwnProperty.call(action.payload, 'maxQuestions')
+            ? action.payload.maxQuestions ?? null
+            : state.maxQuestions ?? null,
         remainingQuestions:
-          action.payload.remainingQuestions ?? state.remainingQuestions ?? state.maxQuestions ?? null,
+          Object.prototype.hasOwnProperty.call(action.payload, 'remainingQuestions')
+            ? action.payload.remainingQuestions ?? null
+            : state.remainingQuestions ?? null,
+      }
+    case 'SET_LIMIT_STATUS':
+      return {
+        ...state,
+        limitReached:
+          typeof action.payload.limitReached === 'boolean'
+            ? action.payload.limitReached
+            : state.limitReached,
+        serviceError:
+          action.payload.serviceError === undefined ? state.serviceError ?? null : action.payload.serviceError,
       }
     default:
       return state
@@ -192,8 +219,8 @@ export async function startGuestSession(
         threadId: null,
         figureSlug: payload.figure_slug ?? figureSlug ?? null,
         placeSlug: placeSlug ?? null,
-        maxQuestions: payload.max_questions ?? null,
-        remainingQuestions: payload.remaining_questions ?? payload.max_questions ?? null,
+        maxQuestions: null,
+        remainingQuestions: null,
         expiresAt: payload.expires_at ?? null,
       },
     })

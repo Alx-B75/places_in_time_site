@@ -150,19 +150,54 @@ export const guestAsk = async (
     payload.thread_id = threadId
   }
 
-  try {
-    const response = await request('/guest/ask', {
-      method: 'POST',
-      body: payload,
-    })
+  const url = `${CHAT_API_BASE_URL}/guest/ask`
 
-    if ((response as any)?.detail || (response as any)?.error) {
-      console.error('[GUEST_ASK] error payload', response)
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    credentials: 'include',
+  })
+
+  let parsed: unknown = {}
+  try {
+    const text = await response.text()
+    parsed = text ? JSON.parse(text) : {}
+  } catch (err) {
+    console.error('[GUEST_ASK] error parsing response', err)
+    parsed = {}
+  }
+
+  if (!response.ok) {
+    const detailNode =
+      parsed && typeof parsed === 'object' ? ((parsed as any).detail ?? parsed) : undefined
+    const errorCode =
+      detailNode && typeof detailNode === 'object'
+        ? detailNode.error_code ?? detailNode.code ?? null
+        : null
+    const message =
+      (detailNode && typeof detailNode === 'object' && detailNode.message) ||
+      (detailNode && typeof detailNode === 'string' ? detailNode : undefined) ||
+      (typeof parsed === 'object' && parsed && (parsed as any).message) ||
+      'Guest request failed. Please try again.'
+    const type =
+      response.status === 403 && errorCode === 'guest_limit_reached'
+        ? 'guest_limit_reached'
+        : response.status === 503 && errorCode === 'llm_quota'
+        ? 'llm_quota'
+        : 'guest_error'
+
+    const errorPayload = {
+      type,
+      status: response.status,
+      errorCode,
+      message,
+      detail: detailNode ?? parsed ?? null,
     }
 
-    return response
-  } catch (error) {
-    console.error('[GUEST_ASK] error', error)
-    throw error
+    console.error('[GUEST_ASK] error', errorPayload)
+    throw errorPayload
   }
+
+  return (parsed ?? {}) as GuestAskResponse
 }

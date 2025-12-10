@@ -22,6 +22,8 @@ const Chat = () => {
     activePlaceSlug,
     maxQuestions,
     remainingQuestions,
+    limitReached,
+    serviceError,
   } = state
   const [inputValue, setInputValue] = useState('')
   const [sending, setSending] = useState(false)
@@ -30,7 +32,11 @@ const Chat = () => {
   const hasError = Boolean(error)
   const normalizedRemaining =
     typeof remainingQuestions === 'number' ? Math.max(remainingQuestions, 0) : null
-  const guestLimitExhausted = typeof normalizedRemaining === 'number' && normalizedRemaining <= 0
+  const showGuestCounter = typeof normalizedRemaining === 'number' && typeof maxQuestions === 'number'
+  const noQuestionsLeft = typeof remainingQuestions === 'number' && remainingQuestions <= 0
+  const guestLimitReached = limitReached || noQuestionsLeft
+  const shouldShowLimitPanel = limitReached || (typeof maxQuestions === 'number' && noQuestionsLeft)
+  const quotaUnavailable = serviceError === 'quota'
 
   useEffect(() => {
     if (!figureSlug) {
@@ -62,7 +68,7 @@ const Chat = () => {
     event.preventDefault()
     const trimmed = inputValue.trim()
 
-    if (!trimmed || !sessionReady || guestLimitExhausted) {
+    if (!trimmed || !sessionReady || guestLimitReached || quotaUnavailable) {
       return
     }
 
@@ -111,17 +117,53 @@ const Chat = () => {
           },
         })
       }
-    } catch (err) {
+
       dispatch({
-        type: 'SET_ERROR',
-        payload: 'Something went wrong sending your message. Please try again.',
+        type: 'SET_LIMIT_STATUS',
+        payload: { limitReached: false, serviceError: null },
       })
+    } catch (err) {
+      const errorType = err?.type
+      if (errorType === 'guest_limit_reached') {
+        const errDetail = err?.detail ?? {}
+        const limitPayload = {
+          remainingQuestions: 0,
+          maxQuestions:
+            errDetail?.max_questions ?? errDetail?.maxQuestions ?? maxQuestions ?? null,
+        }
+        dispatch({ type: 'UPDATE_GUEST_LIMITS', payload: limitPayload })
+        dispatch({
+          type: 'SET_LIMIT_STATUS',
+          payload: { limitReached: true, serviceError: null },
+        })
+        dispatch({
+          type: 'SET_ERROR',
+          payload:
+            err?.message ?? 'Your guest pass is used up. Log in or register to keep chatting.',
+        })
+      } else if (errorType === 'llm_quota') {
+        dispatch({
+          type: 'SET_LIMIT_STATUS',
+          payload: { limitReached: false, serviceError: 'quota' },
+        })
+        dispatch({
+          type: 'SET_ERROR',
+          payload:
+            err?.message ??
+            'Our AI guide is temporarily unavailable because of high demand. Please try again later.',
+        })
+      } else {
+        dispatch({
+          type: 'SET_ERROR',
+          payload: 'Something went wrong sending your message. Please try again.',
+        })
+      }
     } finally {
       setSending(false)
     }
   }
 
-  const disabled = sending || isPreparing || hasError || !sessionReady || guestLimitExhausted
+  const disabled = sending || isPreparing || !sessionReady || guestLimitReached || quotaUnavailable
   const displayFigure = activeFigureSlug ?? figureSlug
   const displayPlace = activePlaceSlug ?? placeSlug
   const contextLine = displayFigure ? (
@@ -146,16 +188,20 @@ const Chat = () => {
       <p className="chat-context">{contextLine}</p>
       {hasError && <p className="chat-error">{error}</p>}
       {isPreparing && figureSlug && <p className="chat-status">Preparing your guest chat session...</p>}
-      {typeof normalizedRemaining === 'number' && (
+      {showGuestCounter && (
         <p className="chat-limit-note">
-          Guest pass: {normalizedRemaining}
-          {maxQuestions ? ` of ${maxQuestions}` : ''} questions remaining.
+          Guest pass: {normalizedRemaining} of {maxQuestions} questions remaining
         </p>
       )}
       {sessionReady && maxQuestions ? (
         <p className="chat-allowance">This guest session allows up to {maxQuestions} questions.</p>
       ) : null}
-      {guestLimitExhausted && (
+      {quotaUnavailable && (
+        <div className="chat-quota-banner">
+          Our AI guide is temporarily unavailable (usage limit reached). Please try again later.
+        </div>
+      )}
+      {shouldShowLimitPanel && (
         <div className="chat-limit-panel">
           <p>Your guest pass is used up. Log in or register to continue the conversation.</p>
           <div className="chat-limit-actions">
@@ -166,7 +212,7 @@ const Chat = () => {
               Sign up
             </a>
             <a className="button" href={`${CHAT_API_BASE_URL}/dashboard`}>
-              Go to dashboard
+              Go to my dashboard
             </a>
           </div>
         </div>
