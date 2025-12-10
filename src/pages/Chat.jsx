@@ -1,8 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useChatStore, startGuestSession } from '../chat/state/chatStore'
 import { guestAsk } from '../chat/api/chatApiClient'
 import { CHAT_API_BASE_URL } from '../config/chatApi'
+import { api } from '../api'
+import FigureHeader from '../components/FigureHeader'
+
+const formatSlugToName = (slug) => {
+  if (!slug) {
+    return null
+  }
+  return slug
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(' ')
+}
 
 const Chat = () => {
   const location = useLocation()
@@ -27,6 +40,10 @@ const Chat = () => {
   } = state
   const [inputValue, setInputValue] = useState('')
   const [sending, setSending] = useState(false)
+  const [figure, setFigure] = useState(null)
+  const [figureLoading, setFigureLoading] = useState(false)
+  const [figureError, setFigureError] = useState(null)
+  const messagesEndRef = useRef(null)
   const sessionReady = guestMode && sessionStarted
   const isPreparing = mode === 'guest-starting' || (loading && !sessionReady)
   const hasError = Boolean(error)
@@ -37,9 +54,18 @@ const Chat = () => {
   const guestLimitReached = limitReached || noQuestionsLeft
   const shouldShowLimitPanel = limitReached || (typeof maxQuestions === 'number' && noQuestionsLeft)
   const quotaUnavailable = serviceError === 'quota'
+  const assistantName = figure?.name ?? formatSlugToName(figureSlug) ?? 'History Guide'
+  const guestPassMessage = showGuestCounter
+    ? normalizedRemaining > 0
+      ? `Guest Pass: ${normalizedRemaining} of ${maxQuestions} questions left`
+      : 'Guest Pass complete - register or log in for more questions'
+    : null
 
   useEffect(() => {
     if (!figureSlug) {
+      setFigure(null)
+      setFigureError(null)
+      setFigureLoading(false)
       return
     }
 
@@ -63,6 +89,48 @@ const Chat = () => {
     activePlaceSlug,
     mode,
   ])
+
+  useEffect(() => {
+    if (!figureSlug) {
+      return
+    }
+
+    let isMounted = true
+    setFigureLoading(true)
+    setFigureError(null)
+
+    api
+      .getFigure(figureSlug)
+      .then((data) => {
+        if (!isMounted) {
+          return
+        }
+        setFigure(data)
+      })
+      .catch((err) => {
+        if (!isMounted) {
+          return
+        }
+        console.error('[CHAT] figure fetch failed', err)
+        setFigure(null)
+        setFigureError('We could not load the full profile right now.')
+      })
+      .finally(() => {
+        if (isMounted) {
+          setFigureLoading(false)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [figureSlug])
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages, sending])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -164,38 +232,20 @@ const Chat = () => {
   }
 
   const disabled = sending || isPreparing || !sessionReady || guestLimitReached || quotaUnavailable
-  const displayFigure = activeFigureSlug ?? figureSlug
-  const displayPlace = activePlaceSlug ?? placeSlug
-  const contextLine = displayFigure ? (
-    <>
-      You're talking to <strong>{displayFigure}</strong>
-      {displayPlace && (
-        <>
-          {' '}
-          about <strong>{displayPlace}</strong>
-        </>
-      )}
-      .
-    </>
-  ) : (
-    <>Select a historical figure from the site to start a conversation.</>
-  )
 
   return (
     <section className="chat-page">
       <p className="eyebrow">Talk to History</p>
       <h1>Places in Time Chat</h1>
-      <p className="chat-context">{contextLine}</p>
+      <FigureHeader
+        figure={figure}
+        loading={figureLoading && Boolean(figureSlug)}
+        error={figureError}
+        slug={figureSlug ?? ''}
+      />
       {hasError && <p className="chat-error">{error}</p>}
       {isPreparing && figureSlug && <p className="chat-status">Preparing your guest chat session...</p>}
-      {showGuestCounter && (
-        <p className="chat-limit-note">
-          Guest pass: {normalizedRemaining} of {maxQuestions} questions remaining
-        </p>
-      )}
-      {sessionReady && maxQuestions ? (
-        <p className="chat-allowance">This guest session allows up to {maxQuestions} questions.</p>
-      ) : null}
+      {guestPassMessage && <p className="chat-limit-note">{guestPassMessage}</p>}
       {quotaUnavailable && (
         <div className="chat-quota-banner">
           Our AI guide is temporarily unavailable (usage limit reached). Please try again later.
@@ -228,11 +278,29 @@ const Chat = () => {
               className={`chat-message chat-message-${msg.role === 'user' ? 'user' : 'assistant'}`}
             >
               <div className="chat-message-meta">
-                <span className="chat-message-role">{msg.role === 'user' ? 'You' : 'History Guide'}</span>
+                <span className="chat-message-role">{msg.role === 'user' ? 'You' : assistantName}</span>
               </div>
               <div className="chat-message-content">{msg.content}</div>
             </div>
           ))}
+          {sending && sessionReady && (
+            <div className="chat-message chat-message-assistant typing">
+              <div className="chat-message-meta">
+                <span className="chat-message-role">{assistantName}</span>
+              </div>
+              <div className="chat-message-content">
+                <div className="chat-typing-indicator" role="status" aria-live="polite">
+                  <span className="chat-typing-label">{assistantName} is thinking...</span>
+                  <span className="chat-typing-dots" aria-hidden="true">
+                    <span className="chat-typing-dot" />
+                    <span className="chat-typing-dot" />
+                    <span className="chat-typing-dot" />
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
         <form className="chat-input-row" onSubmit={handleSubmit}>
           <input
