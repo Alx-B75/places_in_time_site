@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
-import type { Place } from '../api/apiClient'
+import type { Place, HistoricalFigure } from '../api/apiClient'
 import { ApiError } from '../api'
 import { resolveMediaUrl } from '../utils/media'
+import { FIGURES } from '../data/figures'
+import { getRelatedPlaceSlugs } from '../utils/figures'
 
 const buildLocation = (place: Place): string => {
   if (place.location_label) return place.location_label
@@ -25,6 +27,8 @@ const getTypes = (place: Place): string[] => {
   if (place.siteType) return [place.siteType]
   return []
 }
+
+type FigureLike = HistoricalFigure
 
 const formatYear = (value?: number): string => {
   if (typeof value !== 'number') {
@@ -56,6 +60,7 @@ const PlacePage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const [figures, setFigures] = useState<HistoricalFigure[]>([])
 
   useEffect(() => {
     let cancelled = false
@@ -100,6 +105,28 @@ const PlacePage = () => {
     }
   }, [slug])
 
+  useEffect(() => {
+    let cancelled = false
+
+    api
+      .listFigures()
+      .then((data) => {
+        if (!cancelled) {
+          setFigures(data as HistoricalFigure[])
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setFigures([])
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+
   if (loading) {
     return (
       <section className="detail-page">
@@ -141,6 +168,33 @@ const PlacePage = () => {
     { label: 'Type', value: types.join(', ') },
     { label: 'Timeline', value: timeline },
   ].filter((fact) => fact.value)
+
+  const availableFigures =
+    figures.length > 0 ? (figures as FigureLike[]) : (FIGURES as FigureLike[])
+  const placeSlugForQuery = place.slug ?? slug ?? ''
+  const normalizedSlug = placeSlugForQuery.toLowerCase()
+  console.log('PLACE DEBUG --- placeSlugForQuery:', placeSlugForQuery)
+  console.log('PLACE DEBUG --- normalizedSlug:', normalizedSlug)
+  console.log(
+    'PLACE DEBUG --- availableFigures sample:',
+    (availableFigures || []).slice(0, 3).map((f) => ({
+      slug: f.slug,
+      name: f.name,
+      related_places: f.related_places,
+    })),
+  )
+  const relatedFigures = normalizedSlug
+    ? availableFigures.filter((figure) => {
+        const relatedSlugs = getRelatedPlaceSlugs(figure).map((entry) => entry.toLowerCase())
+        console.log(
+          'PLACE DEBUG --- checking figure:',
+          figure.slug,
+          'relatedPlacesParsed:',
+          getRelatedPlaceSlugs(figure),
+        )
+        return relatedSlugs.includes(normalizedSlug)
+      })
+    : []
 
   return (
     <article className="detail-page place-detail">
@@ -225,6 +279,32 @@ const PlacePage = () => {
               </a>
             )}
           </div>
+        </section>
+      )}
+
+      {relatedFigures.length > 0 && (
+        <section className="related-figures">
+          <h2>People connected to this place</h2>
+          <ul className="related-figures-list">
+            {relatedFigures.map((figure) => {
+              const chatParams = new URLSearchParams({ figure_slug: figure.slug })
+              if (placeSlugForQuery) {
+                chatParams.set('place_slug', placeSlugForQuery)
+              }
+              const chatHref = `/chat?${chatParams.toString()}`
+              return (
+                <li key={figure.slug} className="related-figure-item">
+                  <div>
+                    <Link to={`/people/${figure.slug}`}>{figure.name}</Link>
+                    {/* Summary field unused at this stage */}
+                  </div>
+                  <Link className="button" to={chatHref}>
+                    {`Talk to ${figure.name}`}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
         </section>
       )}
 

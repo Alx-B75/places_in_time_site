@@ -74,6 +74,7 @@ export interface HistoricalFigure {
   birth_year?: number | null
   death_year?: number | null
   main_site?: string | null
+  related_places?: string[] | string | null
   related_sites?: string[] | string | null
   sources?: Record<string, unknown> | null
   wiki_links?: Record<string, string> | null

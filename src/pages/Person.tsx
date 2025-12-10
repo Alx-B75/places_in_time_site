@@ -3,7 +3,9 @@ import { Link, useParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import type { HistoricalFigure } from '../api/apiClient'
 import { FIGURES } from '../data/figures'
+import { PLACES } from '../data/places'
 import { resolveMediaUrl } from '../utils/media'
+import { getRelatedPlaceSlugs } from '../utils/figures'
 
 const fallbackFigureImage = '/images/figure-fallback.svg'
 
@@ -13,52 +15,19 @@ type FigureLike = HistoricalFigure & {
   summary?: string
   teaser?: string
   imageUrl?: string
-  mainSite?: string
-  related_places?: string[] | string | null
-  relatedPlaces?: string[] | string | null
 }
 
-const parseRelatedPlaces = (value?: string[] | string | null): string[] => {
-  if (!value) {
-    return []
+const PLACE_NAME_MAP = new Map((PLACES ?? []).map((place) => [place.slug, place.name]))
+
+const formatPlaceLabel = (slug: string): string => {
+  const resolved = PLACE_NAME_MAP.get(slug)
+  if (resolved) {
+    return resolved
   }
-
-  if (Array.isArray(value)) {
-    return value
-      .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
-      .filter((entry): entry is string => Boolean(entry))
-  }
-
-  if (typeof value === 'string') {
-    const trimmed = value.trim()
-    if (!trimmed) {
-      return []
-    }
-
-    if (trimmed.startsWith('[')) {
-      try {
-        const parsed = JSON.parse(trimmed)
-        if (Array.isArray(parsed)) {
-          return parsed
-            .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
-            .filter((entry): entry is string => Boolean(entry))
-        }
-      } catch {
-        // fall through to comma/standalone handling
-      }
-    }
-
-    if (trimmed.includes(',')) {
-      return trimmed
-        .split(',')
-        .map((entry) => entry.trim())
-        .filter((entry) => entry.length > 0)
-    }
-
-    return [trimmed]
-  }
-
-  return []
+  return slug
+    .split('-')
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(' ')
 }
 
 const buildEra = (figure: FigureLike): string =>
@@ -205,16 +174,20 @@ const Person = () => {
   const portrait = figure.image_url ?? figure.imageUrl
   const portraitSrc = resolveMediaUrl(portrait) ?? fallbackFigureImage
   const quote = figure.quote ?? null
-  const mainSite = figure.main_site ?? figure.mainSite ?? null
   const lifespan = formatLifespan(figure.birth_year, figure.death_year)
   const rolesLine = formatRoles(figure.roles)
   const longBio = figure.long_bio ?? null
-  const relatedPlaces = parseRelatedPlaces(figure.related_places ?? figure.relatedPlaces ?? null)
-  const associatedPlaces = relatedPlaces.length > 0
-    ? Array.from(new Set(relatedPlaces))
-    : mainSite
-      ? [mainSite]
+  const relatedPlaceSlugs = Array.from(new Set(getRelatedPlaceSlugs(figure)))
+  const primaryPlaceSlug = relatedPlaceSlugs[0] ?? null
+  const associatedPlaces =
+    relatedPlaceSlugs.length > 0
+      ? relatedPlaceSlugs.map((slug) => ({ slug, label: formatPlaceLabel(slug) }))
       : []
+  const chatParams = new URLSearchParams({ figure_slug: figure.slug })
+  if (primaryPlaceSlug) {
+    chatParams.set('place_slug', primaryPlaceSlug)
+  }
+  const chatLink = `/chat?${chatParams.toString()}`
   const longBioParagraphs = longBio
     ? longBio
         .split(/\n{2,}/)
@@ -239,6 +212,12 @@ const Person = () => {
 
       {error && !notFound && <p className="error-state">{error}</p>}
 
+      <div className="button-row" style={{ justifyContent: 'flex-start' }}>
+        <Link className="button primary" to={chatLink}>
+          {`Talk to ${figure.name}`}
+        </Link>
+      </div>
+
       {(quote || associatedPlaces.length > 0 || lifespan || rolesLine) && (
         <section className="at-a-glance">
           <h2>At a glance</h2>
@@ -250,7 +229,17 @@ const Person = () => {
           <ul className="figure-fact-list">
             {associatedPlaces.length > 0 && (
               <li>
-                <strong>Most associated with:</strong> {associatedPlaces.join(', ')}
+                <strong>Most associated with:</strong>{' '}
+                {associatedPlaces.map((place, index) => (
+                  <span key={place.slug ?? `${place.label}-${index}`}>
+                    {place.slug ? (
+                      <Link to={`/places/${place.slug}`}>{place.label}</Link>
+                    ) : (
+                      place.label
+                    )}
+                    {index < associatedPlaces.length - 1 && ', '}
+                  </span>
+                ))}
               </li>
             )}
             {lifespan && (
