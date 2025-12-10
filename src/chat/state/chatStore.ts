@@ -18,6 +18,7 @@ export interface ChatState {
   activeFigureSlug?: string | null
   activePlaceSlug?: string | null
   maxQuestions?: number | null
+  remainingQuestions?: number | null
   expiresAt?: string | null
   threads: ThreadSummary[]
   currentThreadId?: number | string | null
@@ -34,6 +35,7 @@ const initialState: ChatState = {
   activeFigureSlug: null,
   activePlaceSlug: null,
   maxQuestions: null,
+  remainingQuestions: null,
   expiresAt: null,
   threads: [],
   currentThreadId: null,
@@ -54,6 +56,7 @@ type ChatAction =
         figureSlug?: string | null
         placeSlug?: string | null
         maxQuestions?: number | null
+        remainingQuestions?: number | null
         expiresAt?: string | null
       }
     }
@@ -63,6 +66,7 @@ type ChatAction =
   | { type: 'SET_THREADS'; payload: ThreadSummary[] }
   | { type: 'SET_CURRENT_THREAD'; payload: number | string | null }
   | { type: 'ADD_MESSAGE'; payload: ChatMessage }
+  | { type: 'UPDATE_GUEST_LIMITS'; payload: { maxQuestions?: number | null; remainingQuestions?: number | null } }
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
@@ -93,6 +97,8 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         activeFigureSlug: action.payload.figureSlug ?? state.activeFigureSlug,
         activePlaceSlug: action.payload.placeSlug ?? state.activePlaceSlug,
         maxQuestions: action.payload.maxQuestions ?? null,
+        remainingQuestions:
+          action.payload.remainingQuestions ?? action.payload.maxQuestions ?? null,
         expiresAt: action.payload.expiresAt ?? null,
         messages: [],
       }
@@ -105,6 +111,8 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         guestMode: false,
         sessionStarted: false,
         currentThreadId: null,
+        remainingQuestions: null,
+        maxQuestions: null,
       }
     case 'LOGIN_SUCCESS':
       return {
@@ -113,6 +121,8 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         token: action.payload.token,
         guestMode: false,
         sessionStarted: false,
+        remainingQuestions: null,
+        maxQuestions: null,
         error: null,
       }
     case 'LOGOUT':
@@ -123,6 +133,13 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       return { ...state, currentThreadId: action.payload }
     case 'ADD_MESSAGE':
       return { ...state, messages: [...state.messages, action.payload] }
+    case 'UPDATE_GUEST_LIMITS':
+      return {
+        ...state,
+        maxQuestions: action.payload.maxQuestions ?? state.maxQuestions ?? null,
+        remainingQuestions:
+          action.payload.remainingQuestions ?? state.remainingQuestions ?? state.maxQuestions ?? null,
+      }
     default:
       return state
   }
@@ -176,6 +193,7 @@ export async function startGuestSession(
         figureSlug: payload.figure_slug ?? figureSlug ?? null,
         placeSlug: placeSlug ?? null,
         maxQuestions: payload.max_questions ?? null,
+        remainingQuestions: payload.remaining_questions ?? payload.max_questions ?? null,
         expiresAt: payload.expires_at ?? null,
       },
     })

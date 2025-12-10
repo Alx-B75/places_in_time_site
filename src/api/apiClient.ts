@@ -654,15 +654,24 @@ export class ApiClient {
     return this.request<ContentItem>(`/news/${encodeURIComponent(slug)}`, { method: 'GET' })
   }
 
+  /**
+   * Legacy chat endpoint: retained for reference. The live /chat route uses src/chat/api/chatApiClient.ts instead.
+   */
   ask(payload: AskRequest, token?: string): Promise<AskResponse> {
     return this.request<AskResponse>('/ask', { method: 'POST', body: payload }, token)
   }
 
+  /**
+   * Legacy guest chat starter. Real guest chat is handled by src/chat/api/chatApiClient.ts.
+   */
   guestStart(figureSlug: string): Promise<GuestStartResponse> {
     const params = new URLSearchParams({ figure_slug: figureSlug })
     return this.request<GuestStartResponse>(`/guest/start?${params.toString()}`, { method: 'POST' })
   }
 
+  /**
+   * Legacy guest chat ask helper (unused).
+   */
   guestAsk(payload: GuestAskRequest): Promise<GuestAskResponse> {
     return this.request<GuestAskResponse>('/guest/ask', { method: 'POST', body: payload })
   }

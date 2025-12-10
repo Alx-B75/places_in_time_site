@@ -301,6 +301,7 @@ const PlacePage = () => {
                   <Link className="button" to={chatHref}>
                     {`Talk to ${figure.name}`}
                   </Link>
+                  <small className="chat-cta-note">Short guest chat with limited answers.</small>
                 </li>
               )
             })}

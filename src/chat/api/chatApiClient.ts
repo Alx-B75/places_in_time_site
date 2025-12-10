@@ -9,11 +9,16 @@ export interface GuestStartResponse {
   session_started?: boolean
   figure_slug?: string
   max_questions?: number
+  remaining_questions?: number
   expires_at?: string
 }
 
 export interface GuestAskResponse {
   answer?: string
+  sources?: unknown
+  usage?: unknown
+  max_questions?: number
+  remaining_questions?: number
   [key: string]: any
 }
 

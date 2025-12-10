@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useChatStore, startGuestSession } from '../chat/state/chatStore'
 import { guestAsk } from '../chat/api/chatApiClient'
+import { CHAT_API_BASE_URL } from '../config/chatApi'
 
 const Chat = () => {
   const location = useLocation()
@@ -20,12 +21,16 @@ const Chat = () => {
     activeFigureSlug,
     activePlaceSlug,
     maxQuestions,
+    remainingQuestions,
   } = state
   const [inputValue, setInputValue] = useState('')
   const [sending, setSending] = useState(false)
   const sessionReady = guestMode && sessionStarted
   const isPreparing = mode === 'guest-starting' || (loading && !sessionReady)
   const hasError = Boolean(error)
+  const normalizedRemaining =
+    typeof remainingQuestions === 'number' ? Math.max(remainingQuestions, 0) : null
+  const guestLimitExhausted = typeof normalizedRemaining === 'number' && normalizedRemaining <= 0
 
   useEffect(() => {
     if (!figureSlug) {
@@ -57,7 +62,7 @@ const Chat = () => {
     event.preventDefault()
     const trimmed = inputValue.trim()
 
-    if (!trimmed || !sessionReady) {
+    if (!trimmed || !sessionReady || guestLimitExhausted) {
       return
     }
 
@@ -92,6 +97,20 @@ const Chat = () => {
           },
         })
       }
+
+      const updatedRemaining =
+        res?.remaining_questions ?? res?.remainingQuestions ?? normalizedRemaining ?? null
+      const updatedMax = res?.max_questions ?? res?.maxQuestions ?? maxQuestions ?? null
+
+      if (updatedRemaining !== null || updatedMax !== null) {
+        dispatch({
+          type: 'UPDATE_GUEST_LIMITS',
+          payload: {
+            remainingQuestions: updatedRemaining,
+            maxQuestions: updatedMax,
+          },
+        })
+      }
     } catch (err) {
       dispatch({
         type: 'SET_ERROR',
@@ -102,7 +121,7 @@ const Chat = () => {
     }
   }
 
-  const disabled = sending || isPreparing || hasError || !sessionReady
+  const disabled = sending || isPreparing || hasError || !sessionReady || guestLimitExhausted
   const displayFigure = activeFigureSlug ?? figureSlug
   const displayPlace = activePlaceSlug ?? placeSlug
   const contextLine = displayFigure ? (
@@ -127,9 +146,31 @@ const Chat = () => {
       <p className="chat-context">{contextLine}</p>
       {hasError && <p className="chat-error">{error}</p>}
       {isPreparing && figureSlug && <p className="chat-status">Preparing your guest chat session...</p>}
+      {typeof normalizedRemaining === 'number' && (
+        <p className="chat-limit-note">
+          Guest pass: {normalizedRemaining}
+          {maxQuestions ? ` of ${maxQuestions}` : ''} questions remaining.
+        </p>
+      )}
       {sessionReady && maxQuestions ? (
         <p className="chat-allowance">This guest session allows up to {maxQuestions} questions.</p>
       ) : null}
+      {guestLimitExhausted && (
+        <div className="chat-limit-panel">
+          <p>Your guest pass is used up. Log in or register to continue the conversation.</p>
+          <div className="chat-limit-actions">
+            <a className="button" href={`${CHAT_API_BASE_URL}/login`}>
+              Log in
+            </a>
+            <a className="button" href={`${CHAT_API_BASE_URL}/register`}>
+              Sign up
+            </a>
+            <a className="button" href={`${CHAT_API_BASE_URL}/dashboard`}>
+              Go to dashboard
+            </a>
+          </div>
+        </div>
+      )}
       <div className="chat-shell">
         <div className="chat-messages">
           {messages.length === 0 && (

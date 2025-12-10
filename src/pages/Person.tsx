@@ -216,6 +216,7 @@ const Person = () => {
         <Link className="button primary" to={chatLink}>
           {`Talk to ${figure.name}`}
         </Link>
+        <p className="chat-cta-note">Start a short guest chat session with limited questions.</p>
       </div>
 
       {(quote || associatedPlaces.length > 0 || lifespan || rolesLine) && (

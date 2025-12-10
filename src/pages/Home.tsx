@@ -242,6 +242,7 @@ const Home = () => {
                 {content.heroCtaSecondaryLabel}
               </Link>
             </div>
+            <p className="chat-cta-note">Guest chat sessions include a short question allowance.</p>
           </div>
           <figure className="home-hero-visual">
             <img
@@ -323,6 +324,7 @@ const Home = () => {
               {content.quothaCtaLabel}
             </Link>
           </div>
+          <p className="chat-cta-note">Start a short guest chat with limited questions.</p>
         </div>
         <ChatPreviewBlock messages={chatMessages} />
       </section>
