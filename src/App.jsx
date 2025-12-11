@@ -5,8 +5,7 @@ import Places from './pages/Places.tsx'
 import Place from './pages/Place.tsx'
 import People from './pages/People.tsx'
 import Person from './pages/Person.tsx'
-import Chat from './pages/Chat.jsx'
-import { ChatProvider } from './chat/state/chatStore'
+import ChatHub from './pages/Chat.jsx'
 import Shop from './pages/Shop.jsx'
 import News from './pages/News.tsx'
 import About from './pages/About.tsx'
@@ -25,14 +24,7 @@ const App = () => {
           <Route path="/places/:slug" element={<Place />} />
           <Route path="/people" element={<People />} />
           <Route path="/people/:slug" element={<Person />} />
-          <Route
-            path="/chat"
-            element={
-              <ChatProvider>
-                <Chat />
-              </ChatProvider>
-            }
-          />
+          <Route path="/chat" element={<ChatHub />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/news" element={<News />} />
           <Route path="/about" element={<About />} />
