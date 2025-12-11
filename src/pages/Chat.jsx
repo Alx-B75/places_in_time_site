@@ -172,6 +172,8 @@ const Chat = () => {
         })
       }
 
+      dispatch({ type: 'SET_ERROR', payload: null })
+
       const updatedRemaining =
         res?.remaining_questions ?? res?.remainingQuestions ?? normalizedRemaining ?? null
       const updatedMax = res?.max_questions ?? res?.maxQuestions ?? maxQuestions ?? null
@@ -220,10 +222,20 @@ const Chat = () => {
             err?.message ??
             'Our AI guide is temporarily unavailable because of high demand. Please try again later.',
         })
-      } else {
+      } else if (errorType === 'network') {
         dispatch({
           type: 'SET_ERROR',
-          payload: 'Something went wrong sending your message. Please try again.',
+          payload:
+            err?.message ?? 'We could not reach the chat service. Check your connection and try again.',
+        })
+      } else {
+        const errorDetails = [err?.status ? `status ${err.status}` : null, err?.errorCode ? `code ${err.errorCode}` : null]
+          .filter(Boolean)
+          .join(', ')
+        const suffix = errorDetails ? ` (${errorDetails})` : ''
+        dispatch({
+          type: 'SET_ERROR',
+          payload: `Something went wrong sending your message${suffix}. Please try again.`,
         })
       }
     } finally {

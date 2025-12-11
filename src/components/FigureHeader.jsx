@@ -1,3 +1,5 @@
+import { resolveMediaUrl } from '../utils/media'
+
 const formatSlugToName = (slug) => {
   if (!slug) {
     return null
@@ -50,8 +52,9 @@ const resolveFigureField = (figure, keys) => {
 
 const FigureHeader = ({ figure, loading, error, slug }) => {
   const displayName = figure?.name ?? formatSlugToName(slug) ?? 'History Guide'
-  const portraitUrl =
+  const portraitRaw =
     resolveFigureField(figure, ['profile_image_url', 'image_url', 'hero_image', 'heroImage']) ?? null
+  const portraitUrl = resolveMediaUrl(portraitRaw) ?? portraitRaw
   const headline =
     figure?.short_summary ??
     figure?.teaser ??

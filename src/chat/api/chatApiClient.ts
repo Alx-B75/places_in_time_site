@@ -152,20 +152,41 @@ export const guestAsk = async (
 
   const url = `${CHAT_API_BASE_URL}/guest/ask`
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    credentials: 'include',
-  })
+  let response: Response
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload),
+      credentials: 'include',
+      mode: 'cors',
+    })
+  } catch (error) {
+    console.error('[GUEST_ASK_EXCEPTION]', { url, error })
+    throw {
+      type: 'network',
+      status: 0,
+      errorCode: null,
+      message: 'We could not reach the chat service. Check your connection and try again.',
+      detail: error instanceof Error ? error.message : error,
+    }
+  }
+
+  let bodyText = ''
+  try {
+    bodyText = await response.text()
+  } catch (err) {
+    console.error('[GUEST_ASK_ERROR]', { url, status: response.status, bodyText: null, parserError: err })
+  }
 
   let parsed: unknown = {}
-  try {
-    const text = await response.text()
-    parsed = text ? JSON.parse(text) : {}
-  } catch (err) {
-    console.error('[GUEST_ASK] error parsing response', err)
-    parsed = {}
+  if (bodyText) {
+    try {
+      parsed = JSON.parse(bodyText)
+    } catch (err) {
+      console.error('[GUEST_ASK] error parsing response', err)
+      parsed = {}
+    }
   }
 
   if (!response.ok) {
@@ -195,7 +216,7 @@ export const guestAsk = async (
       detail: detailNode ?? parsed ?? null,
     }
 
-    console.error('[GUEST_ASK] error', errorPayload)
+    console.error('[GUEST_ASK_ERROR]', { url, status: response.status, bodyText, error: errorPayload })
     throw errorPayload
   }
 
