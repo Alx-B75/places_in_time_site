@@ -73,9 +73,19 @@ export interface HistoricalFigure {
   quote?: string | null
   birth_year?: number | null
   death_year?: number | null
+  floruit_start_year?: number | null
+  floruit_end_year?: number | null
   main_site?: string | null
   related_places?: string[] | string | null
   related_sites?: string[] | string | null
+  associated_places?: string[] | string | null
+  era_label?: string | null
+  known_for?: string | null
+  pronunciation?: string | null
+  mini_timeline?: string | unknown[] | null
+  did_you_know?: string | null
+  talk_topics?: string | string[] | null
+  related_figures?: string | string[] | null
   sources?: Record<string, unknown> | null
   wiki_links?: Record<string, string> | null
   verified?: boolean | number | null

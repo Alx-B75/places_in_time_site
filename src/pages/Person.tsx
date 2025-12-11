@@ -17,6 +17,11 @@ type FigureLike = HistoricalFigure & {
   imageUrl?: string
 }
 
+type MiniTimelineItem = {
+  label?: string
+  text?: string
+}
+
 const PLACE_NAME_MAP = new Map((PLACES ?? []).map((place) => [place.slug, place.name]))
 
 const formatPlaceLabel = (slug: string): string => {
@@ -36,58 +41,75 @@ const buildEra = (figure: FigureLike): string =>
 const buildTeaser = (figure: FigureLike): string =>
   figure.short_summary ?? figure.teaser ?? figure.summary ?? ''
 
-const formatYear = (value?: number | null): string => {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return ''
+const parseJsonField = (value: unknown, fallback: unknown[] = []) => {
+  if (!value) {
+    return fallback
   }
-  return value < 0 ? `${Math.abs(value)} BCE` : `${value} CE`
+
+  if (Array.isArray(value)) {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value)
+      return Array.isArray(parsed) ? parsed : fallback
+    } catch {
+      return fallback
+    }
+  }
+
+  return fallback
 }
 
-const formatLifespan = (birth?: number | null, death?: number | null): string | undefined => {
-  const birthText = formatYear(birth)
-  const deathText = formatYear(death)
-
-  if (birthText && deathText) {
-    return `${birthText} – ${deathText}`
+const toStringArray = (value: unknown): string[] => {
+  if (!value) {
+    return []
   }
 
-  if (birthText) return birthText
-  if (deathText) return deathText
-  return undefined
-}
-
-const formatRoles = (roles?: HistoricalFigure['roles']): string | undefined => {
-  if (!roles) return undefined
-
-  if (Array.isArray(roles)) {
-    const cleaned = roles
-      .filter((role): role is string => typeof role === 'string' && role.trim().length > 0)
-      .map((role) => role.trim())
-    return cleaned.length > 0 ? cleaned.join(', ') : undefined
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => (typeof entry === 'string' ? entry : String(entry ?? '')).trim())
+      .filter((entry) => entry.length > 0)
   }
 
-  if (typeof roles === 'string') {
-    const trimmed = roles.trim()
-    if (!trimmed) return undefined
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) {
+      return []
+    }
     if (trimmed.startsWith('[')) {
-      try {
-        const parsed = JSON.parse(trimmed)
-        if (Array.isArray(parsed)) {
-          const cleaned = parsed
-            .filter((role): role is string => typeof role === 'string' && role.trim().length > 0)
-            .map((role) => role.trim())
-          if (cleaned.length > 0) {
-            return cleaned.join(', ')
-          }
-        }
-      } catch {
-        // fall through to returning the trimmed string
+      const parsed = parseJsonField(trimmed, [])
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((entry) => (typeof entry === 'string' ? entry : String(entry ?? '')).trim())
+          .filter((entry) => entry.length > 0)
       }
     }
-    return trimmed
+    return trimmed.split(',').map((segment) => segment.trim()).filter((segment) => segment.length > 0)
   }
 
-  return undefined
+  return []
+}
+
+const formatLifespan = (figure: FigureLike): string | null => {
+  const hasBirth = typeof figure.birth_year === 'number'
+  const hasDeath = typeof figure.death_year === 'number'
+  if (hasBirth || hasDeath) {
+    const birth = hasBirth ? figure.birth_year : '?'
+    const death = hasDeath ? figure.death_year : '?'
+    return `${birth ?? '?'} – ${death ?? '?'}`
+  }
+
+  const hasFloruitStart = typeof figure.floruit_start_year === 'number'
+  const hasFloruitEnd = typeof figure.floruit_end_year === 'number'
+  if (hasFloruitStart || hasFloruitEnd) {
+    const start = hasFloruitStart ? figure.floruit_start_year : '?'
+    const end = hasFloruitEnd ? figure.floruit_end_year : '?'
+    return `fl. ${start ?? '?'} – ${end ?? '?'}`
+  }
+
+  return null
 }
 
 const Person = () => {
@@ -173,106 +195,171 @@ const Person = () => {
   const teaser = buildTeaser(figure)
   const portrait = figure.image_url ?? figure.imageUrl
   const portraitSrc = resolveMediaUrl(portrait) ?? fallbackFigureImage
-  const quote = figure.quote ?? null
-  const lifespan = formatLifespan(figure.birth_year, figure.death_year)
-  const rolesLine = formatRoles(figure.roles)
-  const longBio = figure.long_bio ?? null
+  const lifespan = formatLifespan(figure)
+  const eraLabel = figure.era_label ?? era
+  const heroMetaLine = [lifespan, eraLabel].filter(Boolean).join(' • ')
+  const knownFor = figure.known_for ?? teaser ?? null
+  const summaryCopy = figure.summary ?? figure.short_summary ?? figure.summary_gen ?? teaser ?? ''
+  const rolesList = toStringArray(figure.roles)
+  const rolesLine = rolesList.length > 0 ? rolesList.join(', ') : undefined
   const relatedPlaceSlugs = Array.from(new Set(getRelatedPlaceSlugs(figure)))
   const primaryPlaceSlug = relatedPlaceSlugs[0] ?? null
-  const associatedPlaces =
+  const associatedPlaceMetadata = toStringArray(figure.associated_places)
+  const fallbackAssociatedPlaces =
     relatedPlaceSlugs.length > 0
       ? relatedPlaceSlugs.map((slug) => ({ slug, label: formatPlaceLabel(slug) }))
       : []
+  const associatedPlaces =
+    associatedPlaceMetadata.length > 0
+      ? associatedPlaceMetadata.map((entry) => {
+          const slugMatch = PLACE_NAME_MAP.has(entry) ? entry : undefined
+          return {
+            slug: slugMatch,
+            label: slugMatch ? PLACE_NAME_MAP.get(entry) ?? entry : entry,
+          }
+        })
+      : fallbackAssociatedPlaces
+  const pronunciation = figure.pronunciation?.trim() ?? null
+  const miniTimelineItems = (
+    parseJsonField(figure.mini_timeline, []) as MiniTimelineItem[]
+  ).filter((item) => item && (item.label || item.text))
+  const lifeSummarySource = figure.summary_gen ?? figure.long_bio ?? null
+  const lifeSummaryBlocks = lifeSummarySource
+    ? lifeSummarySource
+        .split(/\n{2,}/)
+        .map((chunk) => chunk.trim())
+        .filter((chunk) => chunk.length > 0)
+    : []
+  const didYouKnow = figure.did_you_know?.trim() ?? null
+  const talkTopics = toStringArray(figure.talk_topics)
+  const relatedFigures = toStringArray(figure.related_figures)
   const chatParams = new URLSearchParams({ figure_slug: figure.slug })
   if (primaryPlaceSlug) {
     chatParams.set('place_slug', primaryPlaceSlug)
   }
   const chatLink = `/chat?${chatParams.toString()}`
-  const longBioParagraphs = longBio
-    ? longBio
-        .split(/\n{2,}/)
-        .map((chunk) => chunk.trim())
-        .filter((chunk) => chunk.length > 0)
-    : null
+  const talkTopicsCopy = talkTopics.length > 0 ? talkTopics : []
+  const relatedFiguresCopy = relatedFigures.length > 0 ? relatedFigures : []
+
+  const shouldShowAtGlance = Boolean(rolesLine || associatedPlaces.length > 0 || pronunciation)
 
   return (
     <article className="detail-page person-detail">
-      <header className="person-header">
+      <section className="person-hero">
         {portraitSrc && (
-          <div className="person-portrait">
+          <div className="person-hero-media">
             <img src={portraitSrc} alt={`Portrait of ${figure.name}`} loading="lazy" />
           </div>
         )}
-        <div>
-          {era && <p className="eyebrow">{era}</p>}
+        <div className="person-hero-body">
+          {heroMetaLine && <p className="person-hero-meta">{heroMetaLine}</p>}
           <h1>{figure.name}</h1>
-          {teaser && <p className="lead">{teaser}</p>}
+          {knownFor && <p className="person-hero-tagline">{knownFor}</p>}
+          {summaryCopy && <p className="person-hero-summary">{summaryCopy}</p>}
+          <div className="button-row" style={{ justifyContent: 'flex-start' }}>
+            <Link className="button primary" to={chatLink}>
+              {`Talk to ${figure.name}`}
+            </Link>
+          </div>
         </div>
-      </header>
+      </section>
 
       {error && !notFound && <p className="error-state">{error}</p>}
 
-      <div className="button-row" style={{ justifyContent: 'flex-start' }}>
-        <Link className="button primary" to={chatLink}>
-          {`Talk to ${figure.name}`}
-        </Link>
-        <p className="chat-cta-note">Start a short guest chat session with limited questions.</p>
-      </div>
+      <section className="person-grid">
+        {shouldShowAtGlance && (
+          <div className="person-card">
+            <h2>At a glance</h2>
+            <dl className="person-fact-grid">
+              {rolesLine && (
+                <div>
+                  <dt>Roles</dt>
+                  <dd>{rolesLine}</dd>
+                </div>
+              )}
+              {associatedPlaces.length > 0 && (
+                <div>
+                  <dt>Most associated with</dt>
+                  <dd>
+                    {associatedPlaces.map((place, index) => (
+                      <span key={place.slug ?? `${place.label}-${index}`}>
+                        {place.slug ? (
+                          <Link to={`/places/${place.slug}`}>{place.label}</Link>
+                        ) : (
+                          place.label
+                        )}
+                        {index < associatedPlaces.length - 1 && ', '}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              )}
+              {pronunciation && (
+                <div>
+                  <dt>Pronunciation</dt>
+                  <dd>{pronunciation}</dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        )}
 
-      {(quote || associatedPlaces.length > 0 || lifespan || rolesLine) && (
-        <section className="at-a-glance">
-          <h2>At a glance</h2>
-          {quote && (
-            <blockquote className="figure-quote">
-              <p>{quote}</p>
-            </blockquote>
-          )}
-          <ul className="figure-fact-list">
-            {associatedPlaces.length > 0 && (
-              <li>
-                <strong>Most associated with:</strong>{' '}
-                {associatedPlaces.map((place, index) => (
-                  <span key={place.slug ?? `${place.label}-${index}`}>
-                    {place.slug ? (
-                      <Link to={`/places/${place.slug}`}>{place.label}</Link>
-                    ) : (
-                      place.label
-                    )}
-                    {index < associatedPlaces.length - 1 && ', '}
-                  </span>
-                ))}
-              </li>
-            )}
-            {lifespan && (
-              <li>
-                <strong>Lifespan:</strong> {lifespan}
-              </li>
-            )}
-            {rolesLine && (
-              <li>
-                <strong>Roles:</strong> {rolesLine}
-              </li>
-            )}
-          </ul>
-        </section>
-      )}
+        {miniTimelineItems.length > 0 && (
+          <div className="person-card person-card-timeline">
+            <h2>Mini timeline</h2>
+            <ul className="person-timeline">
+              {miniTimelineItems.map((item, index) => (
+                <li key={`${item.label ?? 'timeline'}-${index}`}>
+                  {item.label && <span className="person-timeline-label">{item.label}</span>}
+                  {item.text && <p>{item.text}</p>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-      {longBioParagraphs && longBioParagraphs.length > 0 ? (
-        <section className="echoes">
+        <div className="person-card">
           <h2>Life &amp; legacy</h2>
-          {longBioParagraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
-        </section>
-      ) : (
-        <section className="echoes">
-          <h2>Why they matter</h2>
-          <p>
-            Letters, proclamations, and folklore capture how their decisions steered dynasties, raised monuments, and
-            reshaped belief across these islands.
-          </p>
-        </section>
-      )}
+          {lifeSummaryBlocks.length > 0 ? (
+            lifeSummaryBlocks.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+          ) : (
+            <p>
+              Letters, proclamations, and folklore capture how their decisions steered dynasties, raised monuments,
+              and reshaped belief across these islands.
+            </p>
+          )}
+        </div>
+
+        {didYouKnow && (
+          <div className="person-card">
+            <h2>Did you know?</h2>
+            <p>{didYouKnow}</p>
+          </div>
+        )}
+
+        {talkTopicsCopy.length > 0 && (
+          <div className="person-card">
+            <h2>Talk to me about…</h2>
+            <ul className="person-topics">
+              {talkTopicsCopy.map((topic, index) => (
+                <li key={`${topic}-${index}`}>{topic}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {relatedFiguresCopy.length > 0 && (
+          <div className="person-card">
+            <h2>Related figures</h2>
+            <ul className="person-related-list">
+              {relatedFiguresCopy.map((name, index) => (
+                <li key={`${name}-${index}`}>{name}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+
       <Link className="button" to="/people">
         Back to all people
       </Link>
