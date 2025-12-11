@@ -20,6 +20,33 @@ type FigureDisplay = HistoricalFigure & LegacyFigureFields
 const buildEra = (figure: Partial<HistoricalFigure & { era_primary?: string; primaryEra?: string }>): string =>
   figure.era ?? figure.era_primary ?? figure.primaryEra ?? ''
 
+const formatLifespan = (figure: FigureDisplay): string | null => {
+  const hasBirth = typeof figure.birth_year === 'number'
+  const hasDeath = typeof figure.death_year === 'number'
+  if (hasBirth || hasDeath) {
+    const birth = hasBirth ? figure.birth_year : '?'
+    const death = hasDeath ? figure.death_year : '?'
+    return `${birth ?? '?'} – ${death ?? '?'}`
+  }
+
+  const hasFloruitStart = typeof figure.floruit_start_year === 'number'
+  const hasFloruitEnd = typeof figure.floruit_end_year === 'number'
+  if (hasFloruitStart || hasFloruitEnd) {
+    const start = hasFloruitStart ? figure.floruit_start_year : '?'
+    const end = hasFloruitEnd ? figure.floruit_end_year : '?'
+    return `fl. ${start ?? '?'} – ${end ?? '?'}`
+  }
+
+  return null
+}
+
+const buildMetaLine = (figure: FigureDisplay): string => {
+  const lifespan = formatLifespan(figure)
+  const eraLabel = figure.era_label ?? buildEra(figure)
+  const meta = [lifespan, eraLabel].filter(Boolean).join(' • ')
+  return meta || 'Era forthcoming'
+}
+
 const buildTeaser = (
   figure: Partial<HistoricalFigure & { summary?: string; teaser?: string }>,
 ): string => figure.short_summary ?? figure.teaser ?? figure.summary ?? 'Profile coming soon.'
@@ -91,7 +118,7 @@ const People = () => {
           {activeFigures.map((figure) => {
             const portrait = figure.image_url ?? figure.imageUrl
             const portraitSrc = resolveMediaUrl(portrait) ?? fallbackFigureImage
-            const era = buildEra(figure)
+            const metaLine = buildMetaLine(figure)
             const teaser = buildTeaser(figure)
 
             return (
@@ -102,7 +129,7 @@ const People = () => {
                       <img src={portraitSrc} alt={`Portrait of ${figure.name}`} loading="lazy" />
                     </div>
                   )}
-                  <p className="card-eyebrow">{era || 'Era forthcoming'}</p>
+                  <p className="card-eyebrow">{metaLine}</p>
                   <h2>{figure.name}</h2>
                   <p>{teaser}</p>
                 </Link>
