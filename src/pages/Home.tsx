@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import FeaturedPlacesCard from '../components/FeaturedPlacesCard'
 import FigureCard from '../components/FigureCard'
-import EchoSnippet from '../components/EchoSnippet'
 import ChatPreviewBlock from '../components/ChatPreviewBlock'
 import NewsCard from '../components/NewsCard'
 import { api } from '../api'
@@ -217,10 +216,6 @@ const Home = () => {
     }
   })
 
-  const echoSnippets = activePlaces.slice(0, 3).map((place) => ({
-    text: place.echo_text ?? place.echo?.text ?? 'Fresh echo arriving soon.',
-    source: place.echo_title ?? place.echo?.title ?? place.name,
-  }))
 
   const newsItems: NewsCardItem[] = newsFeed.length > 0
     ? newsFeed.slice(0, 3).map((item) => toNewsCardItem(item))
@@ -327,18 +322,6 @@ const Home = () => {
           <p className="chat-cta-note">Start a short guest chat with limited questions.</p>
         </div>
         <ChatPreviewBlock messages={chatMessages} />
-      </section>
-
-      <section>
-        <div className="section-header">
-          <p className="eyebrow">Echoes from the Past</p>
-          <h2>Fragments that hum beneath each visit</h2>
-        </div>
-        <div className="echo-strip">
-          {echoSnippets.map((snippet) => (
-            <EchoSnippet key={snippet.source} snippet={snippet} />
-          ))}
-        </div>
       </section>
 
       <section className="home-shop">
