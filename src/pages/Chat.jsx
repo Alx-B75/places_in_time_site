@@ -31,6 +31,7 @@ const Chat = () => {
     currentThreadId,
     guestMode,
     sessionStarted,
+    sessionId,
     activeFigureSlug,
     activePlaceSlug,
     maxQuestions,
@@ -54,11 +55,15 @@ const Chat = () => {
   const guestLimitReached = limitReached || noQuestionsLeft
   const shouldShowLimitPanel = limitReached || (typeof maxQuestions === 'number' && noQuestionsLeft)
   const quotaUnavailable = serviceError === 'quota'
+  const sessionMissing = sessionReady && !sessionId
   const assistantName = figure?.name ?? formatSlugToName(figureSlug) ?? 'History Guide'
   const guestPassMessage = showGuestCounter
     ? normalizedRemaining > 0
       ? `Guest Pass: ${normalizedRemaining} of ${maxQuestions} questions left`
       : 'Guest Pass complete - register or log in for more questions'
+    : null
+  const sessionMissingMessage = sessionMissing
+    ? "We couldn't start your guest session. Please refresh the page and try again."
     : null
 
   useEffect(() => {
@@ -140,6 +145,14 @@ const Chat = () => {
       return
     }
 
+    if (!sessionId) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: "We couldn't start your guest session. Please refresh the page and try again.",
+      })
+      return
+    }
+
     try {
       setSending(true)
       dispatch({
@@ -153,7 +166,7 @@ const Chat = () => {
       })
       setInputValue('')
 
-      const res = await guestAsk(trimmed, currentThreadId ?? null)
+      const res = await guestAsk(trimmed, sessionId, currentThreadId ?? null)
       const answer =
         res?.answer ??
         res?.message ??
@@ -228,6 +241,12 @@ const Chat = () => {
           payload:
             err?.message ?? 'We could not reach the chat service. Check your connection and try again.',
         })
+      } else if (err?.errorCode === 'guest_session_missing') {
+        dispatch({ type: 'SET_SESSION_TOKEN', payload: null })
+        dispatch({
+          type: 'SET_ERROR',
+          payload: 'Your guest session expired or could not be found. Please refresh the page to start a new chat.',
+        })
       } else {
         const errorDetails = [err?.status ? `status ${err.status}` : null, err?.errorCode ? `code ${err.errorCode}` : null]
           .filter(Boolean)
@@ -243,7 +262,8 @@ const Chat = () => {
     }
   }
 
-  const disabled = sending || isPreparing || !sessionReady || guestLimitReached || quotaUnavailable
+  const disabled =
+    sending || isPreparing || !sessionReady || guestLimitReached || quotaUnavailable || sessionMissing
 
   return (
     <section className="chat-page">
@@ -256,6 +276,7 @@ const Chat = () => {
         slug={figureSlug ?? ''}
       />
       {hasError && <p className="chat-error">{error}</p>}
+      {sessionMissingMessage && <p className="chat-error">{sessionMissingMessage}</p>}
       {isPreparing && figureSlug && <p className="chat-status">Preparing your guest chat session...</p>}
       {guestPassMessage && <p className="chat-limit-note">{guestPassMessage}</p>}
       {quotaUnavailable && (

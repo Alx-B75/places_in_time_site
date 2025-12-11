@@ -14,6 +14,7 @@ export interface ChatState {
   mode: ChatMode
   guestMode: boolean
   sessionStarted: boolean
+  sessionId?: string | null
   token?: string | null
   activeFigureSlug?: string | null
   activePlaceSlug?: string | null
@@ -33,6 +34,7 @@ const initialState: ChatState = {
   mode: 'none',
   guestMode: false,
   sessionStarted: false,
+  sessionId: null,
   token: null,
   activeFigureSlug: null,
   activePlaceSlug: null,
@@ -56,6 +58,7 @@ type ChatAction =
       type: 'GUEST_SESSION_READY'
       payload: {
         sessionStarted: boolean
+        sessionId?: string | null
         threadId?: string | number | null
         figureSlug?: string | null
         placeSlug?: string | null
@@ -72,6 +75,7 @@ type ChatAction =
   | { type: 'ADD_MESSAGE'; payload: ChatMessage }
   | { type: 'UPDATE_GUEST_LIMITS'; payload: { maxQuestions?: number | null; remainingQuestions?: number | null } }
   | { type: 'SET_LIMIT_STATUS'; payload: { limitReached?: boolean; serviceError?: 'quota' | null } }
+  | { type: 'SET_SESSION_TOKEN'; payload: string | null }
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
@@ -85,6 +89,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         mode: 'guest-starting',
         guestMode: false,
         sessionStarted: false,
+        sessionId: null,
         loading: true,
         error: null,
         activeFigureSlug: action.payload.figureSlug,
@@ -98,13 +103,14 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         mode: 'guest',
         guestMode: true,
         sessionStarted: action.payload.sessionStarted,
+        sessionId: action.payload.sessionId ?? null,
         loading: false,
         error: null,
         currentThreadId: action.payload.threadId ?? null,
         activeFigureSlug: action.payload.figureSlug ?? state.activeFigureSlug,
         activePlaceSlug: action.payload.placeSlug ?? state.activePlaceSlug,
-        maxQuestions: null,
-        remainingQuestions: null,
+        maxQuestions: action.payload.maxQuestions ?? null,
+        remainingQuestions: action.payload.remainingQuestions ?? null,
         expiresAt: action.payload.expiresAt ?? null,
         limitReached: false,
         serviceError: null,
@@ -118,6 +124,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         mode: 'none',
         guestMode: false,
         sessionStarted: false,
+        sessionId: null,
         currentThreadId: null,
         remainingQuestions: null,
         maxQuestions: null,
@@ -131,6 +138,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         token: action.payload.token,
         guestMode: false,
         sessionStarted: false,
+        sessionId: null,
         remainingQuestions: null,
         maxQuestions: null,
         limitReached: false,
@@ -166,6 +174,11 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
             : state.limitReached,
         serviceError:
           action.payload.serviceError === undefined ? state.serviceError ?? null : action.payload.serviceError,
+      }
+    case 'SET_SESSION_TOKEN':
+      return {
+        ...state,
+        sessionId: action.payload ?? null,
       }
     default:
       return state
@@ -216,14 +229,21 @@ export async function startGuestSession(
       type: 'GUEST_SESSION_READY',
       payload: {
         sessionStarted: true,
+        sessionId: payload.session_id ?? null,
         threadId: null,
         figureSlug: payload.figure_slug ?? figureSlug ?? null,
         placeSlug: placeSlug ?? null,
-        maxQuestions: null,
-        remainingQuestions: null,
+        maxQuestions: payload.max_questions ?? payload.maxQuestions ?? null,
+        remainingQuestions: payload.remaining_questions ?? payload.remainingQuestions ?? null,
         expiresAt: payload.expires_at ?? null,
       },
     })
+    if (!payload?.session_id) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: 'We could not start your guest session. Please refresh the page and try again.',
+      })
+    }
   } catch (err: any) {
     console.error('[GUEST_START] failed', err)
     dispatch({

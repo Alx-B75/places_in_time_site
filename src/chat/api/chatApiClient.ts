@@ -7,6 +7,7 @@ export interface AuthResponse {
 
 export interface GuestStartResponse {
   session_started?: boolean
+  session_id?: string | null
   figure_slug?: string
   max_questions?: number
   remaining_questions?: number
@@ -135,16 +136,23 @@ export const guestStart = async (
   })) as GuestStartResponse
 
   // eslint-disable-next-line no-console
-  console.debug('[GUEST_START] payload', data)
+  console.debug('[GUEST_START] payload', {
+    ...data,
+    session_id: data?.session_id ? '[hidden]' : data?.session_id ?? null,
+  })
 
   return data
 }
 
 export const guestAsk = async (
   message: string,
+  sessionId?: string | null,
   threadId?: string | number | null,
 ): Promise<GuestAskResponse> => {
-  const payload: { message: string; thread_id?: string | number | null } = { message }
+  const payload: { message: string; session_id?: string | null; thread_id?: string | number | null } = {
+    message,
+    session_id: sessionId ?? null,
+  }
 
   if (threadId !== undefined && threadId !== null) {
     payload.thread_id = threadId
