@@ -6,6 +6,8 @@ import Place from './pages/Place.tsx'
 import People from './pages/People.tsx'
 import Person from './pages/Person.tsx'
 import ChatHub from './pages/Chat.jsx'
+import RedirectPage from './pages/RedirectPage.jsx'
+import FigureQuotha from './pages/FigureQuotha.jsx'
 import Shop from './pages/Shop.jsx'
 import News from './pages/News.tsx'
 import About from './pages/About.tsx'
@@ -24,7 +26,20 @@ const App = () => {
           <Route path="/places/:slug" element={<Place />} />
           <Route path="/people" element={<People />} />
           <Route path="/people/:slug" element={<Person />} />
+          <Route path="/figures/quotha" element={<FigureQuotha />} />
           <Route path="/chat" element={<ChatHub />} />
+          <Route
+            path="/login"
+            element={<RedirectPage to="https://places-in-time-history-chat-front.onrender.com/login" />}
+          />
+          <Route
+            path="/register"
+            element={<RedirectPage to="https://places-in-time-history-chat-front.onrender.com/register" />}
+          />
+          <Route
+            path="/chat-app"
+            element={<RedirectPage to="https://places-in-time-history-chat-front.onrender.com/" />}
+          />
           <Route path="/shop" element={<Shop />} />
           <Route path="/news" element={<News />} />
           <Route path="/about" element={<About />} />

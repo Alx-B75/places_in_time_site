@@ -398,6 +398,47 @@ span {
   color: var(--pit-offwhite);
 }
 
+.figure-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.figure-hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.figure-subtitle {
+  font-size: 1.1rem;
+  max-width: 700px;
+}
+
+.figure-body {
+  margin-top: 2rem;
+}
+
+.figure-cta-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.figure-cta {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  background: #27718a;
+  color: #fff;
+}
+
+.figure-cta-secondary {
+  background: #243036;
+}
+
 .chat-hub {
   max-width: 960px;
   margin: 0 auto;
