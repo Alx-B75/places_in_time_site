@@ -6,6 +6,7 @@ import { FIGURES } from '../data/figures'
 import { PLACES } from '../data/places'
 import { resolveMediaUrl } from '../utils/media'
 import { getRelatedPlaceSlugs } from '../utils/figures'
+import FigureQuotha from './FigureQuotha.jsx'
 
 const fallbackFigureImage = '/images/figure-fallback.svg'
 
@@ -114,6 +115,7 @@ const formatLifespan = (figure: FigureLike): string | null => {
 
 const Person = () => {
   const { slug } = useParams<{ slug: string }>()
+  const isQuotha = slug === 'quotha'
   const [figure, setFigure] = useState<FigureLike | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -124,6 +126,16 @@ const Person = () => {
 
     if (!slug) {
       setError('Missing person identifier')
+      setLoading(false)
+      return () => {
+        cancelled = true
+      }
+    }
+
+    if (isQuotha) {
+      setFigure(null)
+      setNotFound(false)
+      setError(null)
       setLoading(false)
       return () => {
         cancelled = true
@@ -169,7 +181,11 @@ const Person = () => {
     return () => {
       cancelled = true
     }
-  }, [slug])
+  }, [slug, isQuotha])
+
+  if (isQuotha) {
+    return <FigureQuotha />
+  }
 
   if (loading) {
     return (
