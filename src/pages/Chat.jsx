@@ -11,14 +11,13 @@ export default function ChatHub() {
       return
     }
 
-    const personSlug = encodeURIComponent(figureSlug)
-    const redirectParams = new URLSearchParams({ start_chat: "1" })
+    const encodedFigure = encodeURIComponent(figureSlug)
     const placeSlug = searchParams.get("place_slug")?.trim()
-    if (placeSlug) {
-      redirectParams.set("place_slug", placeSlug)
-    }
+    const target = placeSlug
+      ? `/guest/${encodedFigure}?place_slug=${encodeURIComponent(placeSlug)}`
+      : `/guest/${encodedFigure}`
 
-    navigate(`/people/${personSlug}?${redirectParams.toString()}`, { replace: true })
+    navigate(target, { replace: true })
   }, [navigate, searchParams])
 
   return (

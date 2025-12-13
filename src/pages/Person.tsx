@@ -113,8 +113,6 @@ const formatLifespan = (figure: FigureLike): string | null => {
   return null
 }
 
-const GUEST_CHAT_HOST = 'https://places-in-time-history-chat-front.onrender.com'
-
 const Person = () => {
   const location = useLocation()
   const { slug } = useParams<{ slug: string }>()
@@ -258,15 +256,14 @@ const Person = () => {
   if (primaryPlaceSlug) {
     guestChatParams.set('place_slug', primaryPlaceSlug)
   }
-  const chatPath = `/guest/${figure.slug}`
-  const chatHref = `${GUEST_CHAT_HOST}${chatPath}${
+  const guestChatPath = `/guest/${figure.slug}${
     guestChatParams.toString() ? `?${guestChatParams.toString()}` : ''
   }`
   const chatButtonClasses = ['button', 'primary']
   if (startChatIntent) {
     chatButtonClasses.push('button-chat-highlight')
   }
-  const chatButtonLabel = startChatIntent ? `Open chat with ${figure.name}` : `Talk to ${figure.name}`
+  const chatButtonLabel = startChatIntent ? `Resume chat with ${figure.name}` : `Talk to ${figure.name}`
   const talkTopicsCopy = talkTopics.length > 0 ? talkTopics : []
   const relatedFiguresCopy = relatedFigures.length > 0 ? relatedFigures : []
 
@@ -286,13 +283,13 @@ const Person = () => {
           {knownFor && <p className="person-hero-tagline">{knownFor}</p>}
           {summaryCopy && <p className="person-hero-summary">{summaryCopy}</p>}
           <div className="button-row" style={{ justifyContent: 'flex-start' }}>
-            <a className={chatButtonClasses.join(' ')} href={chatHref} target="_blank" rel="noreferrer">
+            <Link className={chatButtonClasses.join(' ')} to={guestChatPath}>
               {chatButtonLabel}
-            </a>
+            </Link>
           </div>
           {startChatIntent && (
             <p className="chat-start-hint" role="status">
-              The guest chat opens in a new tab so you can start talking right away.
+              We will take you straight into the Places in Time guest chat experience.
             </p>
           )}
         </div>

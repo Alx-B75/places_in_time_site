@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "export:places": "node scripts/export_places_json.mjs"
+    "export:places": "node scripts/export_places_json.mjs",
+    "guard:guest-chat": "node scripts/guard_guest_chat_routing.mjs"
   },
   "dependencies": {
     "@sanity/client": "^7.13.1",
