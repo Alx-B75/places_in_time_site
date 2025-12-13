@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import type { HistoricalFigure } from '../api/apiClient'
 import { FIGURES } from '../data/figures'
@@ -113,13 +113,18 @@ const formatLifespan = (figure: FigureLike): string | null => {
   return null
 }
 
+const GUEST_CHAT_HOST = 'https://places-in-time-history-chat-front.onrender.com'
+
 const Person = () => {
+  const location = useLocation()
   const { slug } = useParams<{ slug: string }>()
   const isQuotha = slug === 'quotha'
   const [figure, setFigure] = useState<FigureLike | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const searchParams = new URLSearchParams(location.search)
+  const startChatIntent = searchParams.get('start_chat') === '1'
 
   useEffect(() => {
     let cancelled = false
@@ -249,11 +254,19 @@ const Person = () => {
   const didYouKnow = figure.did_you_know?.trim() ?? null
   const talkTopics = toStringArray(figure.talk_topics)
   const relatedFigures = toStringArray(figure.related_figures)
-  const chatParams = new URLSearchParams({ figure_slug: figure.slug })
+  const guestChatParams = new URLSearchParams()
   if (primaryPlaceSlug) {
-    chatParams.set('place_slug', primaryPlaceSlug)
+    guestChatParams.set('place_slug', primaryPlaceSlug)
   }
-  const chatLink = `/chat?${chatParams.toString()}`
+  const chatPath = `/guest/${figure.slug}`
+  const chatHref = `${GUEST_CHAT_HOST}${chatPath}${
+    guestChatParams.toString() ? `?${guestChatParams.toString()}` : ''
+  }`
+  const chatButtonClasses = ['button', 'primary']
+  if (startChatIntent) {
+    chatButtonClasses.push('button-chat-highlight')
+  }
+  const chatButtonLabel = startChatIntent ? `Open chat with ${figure.name}` : `Talk to ${figure.name}`
   const talkTopicsCopy = talkTopics.length > 0 ? talkTopics : []
   const relatedFiguresCopy = relatedFigures.length > 0 ? relatedFigures : []
 
@@ -273,10 +286,15 @@ const Person = () => {
           {knownFor && <p className="person-hero-tagline">{knownFor}</p>}
           {summaryCopy && <p className="person-hero-summary">{summaryCopy}</p>}
           <div className="button-row" style={{ justifyContent: 'flex-start' }}>
-            <Link className="button primary" to={chatLink}>
-              {`Talk to ${figure.name}`}
-            </Link>
+            <a className={chatButtonClasses.join(' ')} href={chatHref} target="_blank" rel="noreferrer">
+              {chatButtonLabel}
+            </a>
           </div>
+          {startChatIntent && (
+            <p className="chat-start-hint" role="status">
+              The guest chat opens in a new tab so you can start talking right away.
+            </p>
+          )}
         </div>
       </section>
 

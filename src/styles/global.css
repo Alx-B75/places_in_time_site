@@ -398,6 +398,26 @@ span {
   color: var(--pit-offwhite);
 }
 
+.button-chat-highlight {
+  position: relative;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--pit-highlight) 55%, transparent);
+  animation: chatCtaPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes chatCtaPulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pit-highlight) 55%, transparent);
+  }
+
+  70% {
+    box-shadow: 0 0 0 18px color-mix(in srgb, var(--pit-highlight) 0%, transparent);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pit-highlight) 0%, transparent);
+  }
+}
+
 .figure-page {
   max-width: 960px;
   margin: 0 auto;
@@ -1626,6 +1646,12 @@ span {
 .person-hero-summary {
   margin: 0;
   color: var(--pit-ink-soft);
+}
+
+.chat-start-hint {
+  margin: 0;
+  font-weight: 600;
+  color: var(--pit-highlight);
 }
 
 .person-grid {

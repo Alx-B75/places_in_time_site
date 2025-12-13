@@ -1,7 +1,25 @@
-import { Link, useNavigate } from "react-router-dom"
+import { useEffect } from "react"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 
 export default function ChatHub() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    const figureSlug = searchParams.get("figure_slug")?.trim()
+    if (!figureSlug) {
+      return
+    }
+
+    const personSlug = encodeURIComponent(figureSlug)
+    const redirectParams = new URLSearchParams({ start_chat: "1" })
+    const placeSlug = searchParams.get("place_slug")?.trim()
+    if (placeSlug) {
+      redirectParams.set("place_slug", placeSlug)
+    }
+
+    navigate(`/people/${personSlug}?${redirectParams.toString()}`, { replace: true })
+  }, [navigate, searchParams])
 
   return (
     <main className="chat-hub">
